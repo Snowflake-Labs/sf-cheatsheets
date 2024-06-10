@@ -9,3 +9,4 @@ line-length:
   strict: false
   stern: false
 no-inline-html: false
+no-bare-urls: false
