@@ -286,11 +286,13 @@ snow stage list --like '%cli%' --in database foo
 
 ### Copy Files
 
-Create a file to copy, there are few [samples](./samples) in the repo, download `employees.csv`.
+Download [employees.csv](https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/employees.csv),
 
 ```shell
 curl -sSL -o employees.csv https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/employees.csv
 ```
+
+Copy `employees.csv` to stage,
 
 ```shell
 snow stage copy employees.csv '@cli_stage/data'  --schema=cli --database=foo
@@ -310,11 +312,13 @@ snow stage list-files cli_stage --pattern='.*[.]csv' --schema=cli --database=foo
 
 ### Execute Files From Stage
 
-Download the `load_employees.sql` to copy on to the stage,
+Download the [load_employees.sql](https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/load_employees.sql),
 
 ```shell
 curl -sSL -o load_employees.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/load_employees.sql
 ```
+
+Copy `load_employees.sql` to stage,
 
 ```shell
 snow stage copy load_employees.sql '@cli_stage/sql'  --schema=cli --database=foo
@@ -323,7 +327,7 @@ snow stage copy load_employees.sql '@cli_stage/sql'  --schema=cli --database=foo
 Execute the SQL from stage,
 
 ```shell
-snow stage execute '@cli_stage/sql/*'  --schema=cli --database=foo
+snow stage execute '@cli_stage/sql/load_employees.sql'  --schema=cli --database=foo
 ```
 
 > [!NOTE]
@@ -334,6 +338,30 @@ Query all employees to make sure the load worked,
 
 ```shell
 snow sql --schema=cli --database=foo -q 'SELECT * FROM EMPLOYEES'
+```
+
+Download [variables.sql](https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/variables.sql),
+
+```shell
+curl -sSL -o load_employees.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/variables.sql
+```
+
+Copy the `variables.sql` to stage,
+
+```shell
+snow stage execute '@cli_stage/sql/variables.sql' --variable="dept=1" --schema=cli --database=foo
+```
+
+Execute files from stage with variables,
+
+```shell
+snow stage execute '@cli_stage/sql/variables.sql' --variable="dept=1"  --schema=cli --database=foo
+```
+
+The `variables.sql` would have created a view named `EMPLOYEE_DEPT_VIEW`, list the view it to see the variables replaced,
+
+```shell
+snow object list view --like '%emp%' --database=foo --schema=cli
 ```
 
 ### Remove File(s) from Stage
@@ -347,5 +375,6 @@ snow stage remove cli_stage 'data/'  --schema=cli --database=foo
 - [Snowflake Developers::Getting Started With Snowflake CLI](https://youtu.be/ooyZh56NePA?si=3yV3s2z9YwPWVJc-)
 - [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index)
 - [Accelerate Development and Productivity with DevOps in Snowflake](https://www.snowflake.com/blog/devops-snowflake-accelerating-development-productivity/)
+- [Execute Immediate Jinja Templating](https://docs.snowflake.com/en/sql-reference/sql/execute-immediate-from)
 
 [^1]: https://docs.snowflake.com/developer-guide/snowflake-cli-v2/connecting/specify-credentials#how-to-use-environment-variables-for-snowflake-credentials
