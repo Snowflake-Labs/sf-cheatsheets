@@ -2,6 +2,7 @@
 authors: Kamesh Sampath
 date: 2024-06-10
 version: v1
+snow_cli_version: 2.4.1
 tags: [cli, cheatsheets]
 ---
 
@@ -370,11 +371,140 @@ snow object list view --like '%emp%' --database=foo --schema=cli
 snow stage remove cli_stage 'data/'  --schema=cli --database=foo
 ```
 
+## Native Apps
+
+### Create App
+
+Create a Snowflake Native App `my_first_app` in current working directory,
+
+```shell
+snow app init my_first_app
+```
+
+Create a Snowflake Native App with name `my-first-app` in directory `my_first_app`
+
+```shell
+snow app init --name 'my-first-app' my_first_app
+```
+
+> [!NOTE]
+> Since the name becomes a part of the application URL its recommended to have URL
+> safe names
+
+Create a Snowflake Native App `my_first_app` with Streamlit Python template[^2]
+
+```shell
+snow app init my_first_app --template streamlit-python
+```
+
+> [!NOTE]
+> You can also create your Snowflake Native App template and use `--template-repo`
+> instead, to scaffold your Native App using your template.
+
+### Run App
+
+From the application directory e.g. `my_first_app`
+
+```shell
+snow app run
+```
+
+### Version App
+
+#### Create Version
+
+Create a development version named `dev`,
+
+```shell
+snow app version create
+```
+
+Create a development version named `v1_0`,
+
+```shell
+snow app version create v1_0
+```
+
+> ![IMPORTANT]
+> The version name should be valid SQL identifier e.g. no dots and start with a character
+> usually version labels use `v`.
+
+List available versions
+
+```shell
+snow app version list
+```
+
+#### Drop a Version
+
+```shell
+snow app version list v1_0
+```
+
+#### Deploy a Version
+
+Deploy a particular version of an application,
+
+```shell
+snow app run --version=v1_0
+```
+
+Deploy a particular version and patch,
+
+```shell
+snow app run --version=v1_0 --patch=1
+```
+
+> [!NOTE]
+> Version `patches` are automatically incremented when creating version with same name
+
+## Open App
+
+Open the application on a browser, from the application directory e.g. `my_first_app`
+
+```shell
+snow app open
+```
+
+## Deploy
+
+Synchronize the local application file changes with stage and don't create/update the running application
+
+```shell
+snow app deploy
+```
+
+## Delete App
+
+```shell
+snow app teardown
+```
+
+If the application has version associated then drop the version,
+
+```shell
+snow app version drop
+```
+
+And then drop the application
+
+```shell
+snow app teardown
+```
+
+Drop application and its associated database objects,
+
+```shell
+snow app teardown --cascade
+```
+
 ## References
 
 - [Snowflake Developers::Getting Started With Snowflake CLI](https://youtu.be/ooyZh56NePA?si=3yV3s2z9YwPWVJc-)
 - [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index)
 - [Accelerate Development and Productivity with DevOps in Snowflake](https://www.snowflake.com/blog/devops-snowflake-accelerating-development-productivity/)
 - [Execute Immediate Jinja Templating](https://docs.snowflake.com/en/sql-reference/sql/execute-immediate-from)
+- [Snowflake Native App Tutorial](https://docs.snowflake.com/en/developer-guide/native-apps/tutorials/getting-started-tutorial)
 
 [^1]: https://docs.snowflake.com/developer-guide/snowflake-cli-v2/connecting/specify-credentials#how-to-use-environment-variables-for-snowflake-credentials
+[^2]: https://github.com/snowflakedb/native-apps-templates
