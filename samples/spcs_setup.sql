@@ -1,3 +1,4 @@
+--!jinja
 USE ROLE ACCOUNTADMIN;
 -- Role that will be used to create services
 CREATE ROLE IF NOT EXISTS cheatsheets_spcs_demo_role;
@@ -38,4 +39,4 @@ GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO ROLE cheatsheets_spcs_demo_role;
 GRANT USAGE, MONITOR ON COMPUTE POOL my_xs_compute_pool TO ROLE cheatsheets_spcs_demo_role;
 
 -- grant cheatsheets_spcs_demo_role role to current user
-GRANT ROLE cheatsheets_spcs_demo_role TO USER &USER;
+GRANT ROLE cheatsheets_spcs_demo_role TO USER &{ctx.env.SNOWFLAKE_USER};

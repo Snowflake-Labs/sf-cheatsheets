@@ -72,7 +72,7 @@ Adding connection `cheatsheets` following the prompts,
 snow connection add
 ```
 
-Adding connection named `cheatsheets` using command options,
+Adding connection using command options,
 
 ```shell
 snow connection add --connection-name cheatsheets \
@@ -141,13 +141,23 @@ EOF
 
 ### Listing Objects
 
+Use the following command to see the list of supported objects,
+
+```shell
+snow object list --help
+```
+
 #### Warehouses
+
+List all available warehouses for the current role,
 
 ```shell
 snow object list warehouse
 ```
 
 #### Databases
+
+List all available databases for the current role,
 
 ```shell
 snow object list database
@@ -161,7 +171,7 @@ snow object list database --format json
 
 > [!TIP]
 > With `JSON` you can extract values using tools like [jq](https://jqlang.github.io/jq/)
-> e.g.
+> e.g. to get only names of the databases
 >
 > ```shell
 >  snow object list database --format json | jq '.[].name'
@@ -175,11 +185,13 @@ snow object list database --like '%snow%'
 
 #### Schemas
 
+List all schemas,
+
 ```shell
 snow object list schema
 ```
 
-Filtering schemas by database,
+Filtering schemas by database named `foo`,
 
 ```shell
 snow object list schema --in database foo
@@ -187,11 +199,13 @@ snow object list schema --in database foo
 
 #### Tables
 
+List all tables
+
 ```shell
 snow object list table
 ```
 
-List tables in a specific schema of a database,
+List tables in a specific schema `cli` of a database `foo`,
 
 ```shell
 snow object list table --database foo --in schema cli
@@ -207,6 +221,8 @@ snow object describe table employees --database foo --schema cli
 
 ### Drop an object
 
+Drop an table named `employees` in schema `cli` of database `foo`,
+
 ```shell
 snow object drop table employees --database foo --schema cli
 ```
@@ -219,7 +235,7 @@ Create a [Streamlit](https://streamlit.io) application and deploy to Snowflake,
 snow streamlit init streamlit_app
 ```
 
-Create a Warehouse that the Streamlit application will use,
+Create a warehouse that the Streamlit application will use,
 
 ```shell
 snow sql -q 'CREATE WAREHOUSE my_streamlit_warehouse'
@@ -231,7 +247,7 @@ Create a database that the Streamlit application will use,
 snow sql -q 'CREATE DATABASE my_streamlit_app'
 ```
 
-### Deploy Application
+### Deploy an Application
 
 > [!IMPORTANT]
 > Ensure you are in the Streamlit application folder before running the command.
@@ -242,11 +258,15 @@ snow streamlit deploy --database=my_streamlit_app
 
 ### List Applications
 
+List all available streamlit applications,
+
 ```shell
 snow streamlit list
 ```
 
 ### Describe Application
+
+Get details about a streamlit application `streamlit_app` in schema of `public` of database`my_streamlit_app`,
 
 ```shell
 snow streamlit describe streamlit_app --schema=public --database=my_streamlit_app
@@ -258,11 +278,15 @@ snow streamlit describe streamlit_app --schema=public --database=my_streamlit_ap
 
 ### Get Application URL
 
+Get the streamlit application URL i.e. the URL used to access the hosted application,
+
 ```shell
 snow streamlit get-url streamlit_app --database=my_streamlit_app
 ```
 
 ### Drop Application
+
+Drop a streamlit application named `streamlit_app` in schema of `public` of database`my_streamlit_app`,
 
 ```shell
 snow streamlit drop streamlit_app --schema=public --database=my_streamlit_app
@@ -272,11 +296,15 @@ snow streamlit drop streamlit_app --schema=public --database=my_streamlit_app
 
 ### Create
 
+Create a stage named `cli_stage` in schema `cli` of database `foo`,
+
 ```shell
 snow stage create cli_stage  --schema=cli --database=foo
 ```
 
 ### Describe
+
+Get details of stage,
 
 ```shell
 snow stage describe cli_stage  --schema=cli --database=foo
@@ -290,16 +318,16 @@ List all available stages,
 snow stage list
 ```
 
-List stages in specific database,
+List stages in specific to a database named `foo`,
 
 ```shell
 snow stage list --in database foo
 ```
 
-List stages by name that starts with `cli`,
+List stages by name that starts with `cli` in database `foo`,
 
 ```shell
-snow stage list --like '%cli%' --in database foo
+snow stage list --like 'cli%' --in database foo
 ```
 
 ### Copy Files
@@ -310,13 +338,15 @@ Download [employees.csv](https://github.com/Snowflake-Labs/sf-cheatsheets/blob/m
 curl -sSL -o employees.csv https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/employees.csv
 ```
 
-Copy `employees.csv` to stage,
+Copy `employees.csv` to stage `cli_stage` to a path `/data`,
 
 ```shell
 snow stage copy employees.csv '@cli_stage/data'  --schema=cli --database=foo
 ```
 
 ### List Files in Stage
+
+List all files in stage `cli_stage` in schema `cli` of database `foo`,
 
 ```shell
 snow stage list-files cli_stage  --schema=cli --database=foo
@@ -336,13 +366,13 @@ Download the [load_employees.sql](https://github.com/Snowflake-Labs/sf-cheatshee
 curl -sSL -o load_employees.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/load_employees.sql
 ```
 
-Copy `load_employees.sql` to stage,
+Copy `load_employees.sql` to stage `cli_stage` at path `/sql`,
 
 ```shell
 snow stage copy load_employees.sql '@cli_stage/sql'  --schema=cli --database=foo
 ```
 
-Execute the SQL from stage,
+Execute the SQL[^2] from stage,
 
 ```shell
 snow stage execute '@cli_stage/sql/load_employees.sql'  --schema=cli --database=foo
@@ -361,28 +391,30 @@ snow sql --schema=cli --database=foo -q 'SELECT * FROM EMPLOYEES'
 Download [variables.sql](https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/variables.sql),
 
 ```shell
-curl -sSL -o load_employees.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/variables.sql
+curl -sSL -o variables.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/variables.sql
 ```
 
 Copy the `variables.sql` to stage,
 
 ```shell
-snow stage execute '@cli_stage/sql/variables.sql' --variable="dept=1" --schema=cli --database=foo
+snow stage copy  variables.sql '@cli_stage/sql' --schema=cli --database=foo
 ```
 
-Execute files from stage with variables,
+Execute files from stage with values for template variables(`{{.dept}}` in variables.sql),
 
 ```shell
 snow stage execute '@cli_stage/sql/variables.sql' --variable="dept=1"  --schema=cli --database=foo
 ```
 
-The `variables.sql` would have created a view named `EMPLOYEE_DEPT_VIEW`, list the view it to see the variables replaced,
+Executing `variables.sql` would have created a view named `EMPLOYEE_DEPT_VIEW`, list the view it to see the variables replaced,
 
 ```shell
-snow object list view --like '%emp%' --database=foo --schema=cli
+snow object list view --like 'emp%' --database=foo --schema=cli
 ```
 
 ### Remove File(s) from Stage
+
+Remove all files from stage `cli_stage` on path `/data`
 
 ```shell
 snow stage remove cli_stage 'data/'  --schema=cli --database=foo
@@ -398,7 +430,7 @@ Create a Snowflake Native App `my_first_app` in current working directory,
 snow app init my_first_app
 ```
 
-Create a Snowflake Native App with name `my-first-app` in directory `my_first_app`
+Create a Snowflake Native App in directory `my_first_app`
 
 ```shell
 snow app init --name 'my-first-app' my_first_app
@@ -408,7 +440,7 @@ snow app init --name 'my-first-app' my_first_app
 > Since the name becomes a part of the application URL its recommended to have URL
 > safe names
 
-Create a Snowflake Native App `my_first_app` with Streamlit Python template[^2]
+Create a Snowflake Native App with Streamlit Python template[^3]
 
 ```shell
 snow app init my_first_app --template streamlit-python
@@ -428,6 +460,10 @@ snow app run
 
 ### Version App
 
+> ![IMPORTANT]
+> The version name should be valid SQL identifier e.g. no dots and start with a character
+> usually version labels use `v`.
+
 #### Create Version
 
 Create a development version named `dev`,
@@ -441,10 +477,6 @@ Create a development version named `v1_0`,
 ```shell
 snow app version create v1_0
 ```
-
-> ![IMPORTANT]
-> The version name should be valid SQL identifier e.g. no dots and start with a character
-> usually version labels use `v`.
 
 List available versions
 
@@ -515,15 +547,17 @@ Drop application and its associated database objects,
 snow app teardown --cascade
 ```
 
-## Snowpark Container Services
+## Snowpark Container Services(SPCS)
 
 > [!IMPORTANT]
-> Snowpark Container Services is available only on certain AWS regions and
-> not available for trial accounts
+>
+> - SPCS is available only on certain AWS regions and
+>   not available for trial accounts
+> - All Snowpark Containers are run using a defined compute pool.
 
 ### Compute Pool
 
-List of available instance families[^3]
+List of available instance families[^4]
 
 - CPU_X64_XS
 - CPU_X64_S
@@ -538,66 +572,67 @@ List of available instance families[^3]
 
 #### Create
 
-Create a compute pool named `my_xs_compute_pool`
+Create a compute pool named `my_xs_compute_pool` with family `CPU_X64_XS`,
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS
 ```
 
-Create a compute pool named `my_xs_compute_pool` if it not already exists,
+Create with `if not exists`,
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --if-not-exists
 ```
 
-Create a compute pool named `my_xs_compute_pool` that is suspended initially(**default**: not suspended initially),
+Create with initially suspended (**default**: not suspended initially),
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --init-suspend
 ```
 
-Create a compute pool named `my_xs_compute_pool` with auto suspend(**default**: `3600 secs`) set to `2 mins(120 secs)` ,
+Create with auto suspend(**default**: `3600 secs`) set to `2 mins(120 secs)` ,
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --auto-suspend-secs=120
 ```
 
-Create a compute pool named `my_xs_compute_pool` with minimum nodes as `1`(**default**) and
-maximum nodes as `3`
+Create with minimum nodes(scale down) as `1`(**default**) and maximum nodes(scale up) as `3`
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --min-nodes=1 --max-nodes=3
 ```
 
-Create a compute pool named `my_xs_compute_pool` that auto resumes on service/job request,
+Create with auto resume on service/job request,
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --auto-resume
 ```
 
-Create a compute pool named `my_xs_compute_pool` with auto-resume disabled,
+Create with auto-resume disabled,
+
+> [!NOTE]
+> Auto Resume disabled requires the compute pool to be started manually.
 
 ```shell
 snow spcs compute-pool create my_xs_compute_pool \
   --family CPU_X64_XS --no-auto-resume
 ```
 
-> [!NOTE]
-> Auto Resume disabled requires the compute pool to be started manually.
-
 #### List Compute Pool
+
+List all available compute pools for current role,
 
 ```shell
 snow spcs compute-pool list
 ```
 
-List compute pool like `my_xs%`
+List compute pools like `my_xs%`
 
 ```shell
 snow spcs compute-pool list --like 'my_xs%'
@@ -605,11 +640,15 @@ snow spcs compute-pool list --like 'my_xs%'
 
 #### Describe Compute Pool
 
+Get details about a compute pool,
+
 ```shell
 snow spcs compute-pool describe my_xs_compute_pool
 ```
 
 #### Status of Compute Pool
+
+To know the current status of a compute pool,
 
 ```shell
 snow spcs compute-pool status my_xs_compute_pool
@@ -617,11 +656,15 @@ snow spcs compute-pool status my_xs_compute_pool
 
 #### Suspend a Compute Pool
 
+Suspend a compute pool,
+
 ```shell
 snow spcs compute-pool suspend my_xs_compute_pool
 ```
 
 #### Resume a Compute Pool
+
+Resume a compute pool,
 
 ```shell
 snow spcs compute-pool resume my_xs_compute_pool
@@ -629,7 +672,7 @@ snow spcs compute-pool resume my_xs_compute_pool
 
 #### Properties on Compute Pool
 
-You can `set/unset` the following properties on a Compute pool after it's created,
+You can `set/unset` the following properties on a compute pool after it's created,
 
 | Option                | Description             |
 | :-------------------- | :---------------------- |
@@ -642,11 +685,15 @@ You can `set/unset` the following properties on a Compute pool after it's create
 
 ##### Set
 
+Add a `comment` to the compute pool,
+
 ```shell
 snow spcs compute-pool set --comment 'my small compute pool' my_xs_compute_pool
 ```
 
 ##### Unset
+
+Remove the `comment` from compute pool,
 
 ```shell
 snow spcs compute-pool unset --comment my_xs_compute_pool
@@ -661,6 +708,8 @@ snow spcs compute-pool stop-all my_xs_compute_pool
 ```
 
 #### Drop Compute Pool
+
+Drop the compute pool,
 
 ```shell
 snow spcs compute-pool drop my_xs_compute_pool
@@ -679,7 +728,7 @@ snow spcs image-registry login
 
 #### Token
 
-Get `current user` token to access image registry
+Get `current user` token to access image registry,
 
 ```shell
 snow spcs image-registry token
@@ -687,7 +736,7 @@ snow spcs image-registry token
 
 #### Registry URL
 
-Get image registry URL
+Get image registry URL,
 
 ```shell
 snow spcs image-registry url
@@ -696,26 +745,35 @@ snow spcs image-registry url
 ### Image Repository
 
 > [!IMPORTANT]
-> A Database and Schema is required to create the Image Repository and
-> services can't be created using `ACCOUNTADMIN`, we need to create a custom role
-> and use that role as part of the service creation in upcoming sections
-> The [SQL script](https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql) for setting up role,grants and warehouse, customize as needed.
+>
+> - A Database and Schema is required to create the Image Repository
+> - Services can't be created using `ACCOUNTADMIN`, a custom role is required
 
-As `ACCOUNTADMIN` run the script to setup required Snowflake resources namely,
+The [SQL script](https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql) defines role, grants and warehouse.
 
-- A Role named `cheatsheets_spcs_demo_role` to create services
-- A Database named `CHEATSHEETS_DB`.
+As `ACCOUNTADMIN` run the script to setup required Snowflake resources,
+
+- A Role named `cheatsheets_spcs_demo_role` to create Snowpark Container Services
+- A Database named `CHEATSHEETS_DB` where the services will be attached to
 - A Schema named `DATA_SCHEMA` on DB `CHEATSHEETS_DB` to hold the image repository.
 - A Warehouse `cheatsheets_spcs_wh_s` which will be used to run query from services.
 
+Set your Snowflake account user name,
+
+```shell
+export SNOWFLAKE_USER=<your snowflake user>
+```
+
+Run the `spcs_setup.sql` create the aforementioned Snowflake objects,
+
 ```shell
 curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql |
-snow sql --variable="USER=<snowflake user>" --stdin
+snow sql --stdin
 ```
 
 #### Create
 
-Create a image repository named `my-image-repository`,
+Create a image repository named `my_image_repository`,
 
 ```shell
 snow spcs image-repository create my_image_repository \
@@ -724,7 +782,7 @@ snow spcs image-repository create my_image_repository \
   --role='cheatsheets_spcs_demo_role'
 ```
 
-Create image repository named `my-image-repository`(if not exists),
+Create with if not exists,
 
 ```shell
 snow spcs image-repository create my_image_repository \
@@ -734,7 +792,7 @@ snow spcs image-repository create my_image_repository \
   --if-not-exists
 ```
 
-Replace image repository named `my-image-repository`,
+Replace image repository `my_image_repository`,
 
 ```shell
 snow spcs image-repository create my_image_repository \
@@ -746,7 +804,7 @@ snow spcs image-repository create my_image_repository \
 
 #### List Image Repositories
 
-List all image repositories in the database/schema,
+List all image repositories in the database and schema,
 
 ```shell
 snow spcs image-repository list \
@@ -771,11 +829,11 @@ snow spcs image-repository url my_image_repository \
 Let us push a sample image to repository,
 
 ```shell
-docker pull --platform=linux/amd64 nginx
 IMAGE_REPOSITORY=$(snow spcs image-repository url my_image_repository \
   --database='CHEATSHEETS_DB' \
   --schema='DATA_SCHEMA'  \
   --role='cheatsheets_spcs_demo_role')
+docker pull --platform=linux/amd64 nginx
 docker tag nginx "$IMAGE_REPOSITORY/nginx"
 docker push "$IMAGE_REPOSITORY/nginx"
 ```
@@ -791,7 +849,7 @@ snow spcs image-repository list-images my_image_repository \
 
 #### List Image Tags
 
-List all tags for image `busybox` in repository `my_image_repository`,
+List all tags for image `nginx` in repository `my_image_repository`,
 
 > [!IMPORTANT]
 > The `--image-name` should be fully qualified name. Use `list-images` to get
@@ -816,7 +874,7 @@ snow spcs image-repository drop my_image_repository \
 
 ### Services
 
-Create service specification file,
+Create a SPCS service specification[^5] file,
 
 > [!TIP]
 > Tools like [jq](https://jqlang.github.io/jq/) can help extract data from the command output
@@ -844,8 +902,8 @@ spec:
 EOF
 ```
 
-Create a Service named `nginx` that uses the compute pool `my_xs_compute_pool` and
-using the specification `work/service-spec.yaml`,
+Create a Service named `nginx` using compute pool `my_xs_compute_pool` and
+specification `work/service-spec.yaml`,
 
 ```shell
 snow spcs service create nginx \
@@ -856,8 +914,7 @@ snow spcs service create nginx \
   --role='cheatsheets_spcs_demo_role'
 ```
 
-Create a Service named `nginx` (**if not exists**) that uses the compute pool `my_xs_compute_pool` and
-using the specification `work/service-spec.yaml`,
+Create a Service if not exists,
 
 ```shell
 snow spcs service create nginx \
@@ -869,8 +926,7 @@ snow spcs service create nginx \
   --role='cheatsheets_spcs_demo_role'
 ```
 
-Create a Service named `nginx` (**if not exists**) that uses the compute pool `my_xs_compute_pool` and
-using the specification `work/service-spec.yaml` with minimum instances `1` (default) and maximum instances to be `3`,
+Create with minimum instances `1` (**default**) and maximum instances to be `3`,
 
 ```shell
 snow spcs service create nginx \
@@ -883,7 +939,7 @@ snow spcs service create nginx \
   --role='cheatsheets_spcs_demo_role'
 ```
 
-Create service named `nginx` and set it to use a specific warehouse `cheatsheets_spcs_wh_s` for all its queries,
+Create service that uses a specific warehouse `cheatsheets_spcs_wh_s` for all its queries,
 
 ```shell
 snow spcs service create nginx \
@@ -897,7 +953,7 @@ snow spcs service create nginx \
 
 #### Status
 
-Check the status of the service
+Check service status,
 
 > [!NOTE]
 > It will take few minutes for the service to be in `READY` status
@@ -911,7 +967,7 @@ snow spcs service status nginx \
 
 #### Describe
 
-Describe service details,
+Get more details about the service,
 
 ```shell
 snow spcs service describe nginx \
@@ -922,7 +978,7 @@ snow spcs service describe nginx \
 
 #### Check Logs of Service
 
-Check the logs of the container named `nginx` with instance `0` on service `nginx`,
+Check the logs of service with the container named `nginx` with instance `0`,
 
 > [!NOTE]
 > Find `instanceId` and `containerName` using the command `describe` command.
@@ -938,7 +994,7 @@ snow spcs service logs nginx \
 
 #### List
 
-List all services,
+List all available services,
 
 ```shell
 snow spcs service list  \
@@ -947,7 +1003,7 @@ snow spcs service list  \
   --role='cheatsheets_spcs_demo_role'
 ```
 
-Query services`in` database,
+Query services `in` database,
 
 ```shell
 snow spcs service list  --in database CHEATSHEETS_DB \
@@ -978,7 +1034,7 @@ snow spcs service list-endpoints nginx  \
 
 #### Suspend a service
 
-Suspend the service named `nginx`
+Suspend the service,
 
 ```shell
 snow spcs service suspend nginx  \
@@ -989,7 +1045,7 @@ snow spcs service suspend nginx  \
 
 #### Resume a service
 
-Resume the service named `nginx`
+Resume the service,
 
 ```shell
 snow spcs service resume nginx  \
@@ -1003,7 +1059,7 @@ snow spcs service resume nginx  \
 
 #### Supported properties on Service
 
-You can set the following properties on a Service after it's created
+You can `set/unset` the following properties on a service even after it's created,
 
 | Option              | Description                                                              |
 | :------------------ | :----------------------------------------------------------------------- |
@@ -1016,7 +1072,7 @@ You can set the following properties on a Service after it's created
 
 ##### Set
 
-Add a comment about the service,
+Add a comment to the service,
 
 ```shell
 snow spcs service set --comment 'the nginx service' nginx  \
@@ -1029,6 +1085,8 @@ Use service `describe` to check on the updated property
 
 ##### Unset
 
+Remove the comment from the service,
+
 ```shell
 snow spcs service unset --comment nginx  \
   --database='CHEATSHEETS_DB' \
@@ -1038,7 +1096,7 @@ snow spcs service unset --comment nginx  \
 
 #### Upgrade
 
-Upgrade the service `nginx` with new specification e.g a version upgrade or probe updates etc.,
+Upgrade the service `nginx` with new specification e.g a tag upgrade or probe updates etc.,
 
 ```shell
 snow spcs service upgrade nginx \
@@ -1060,7 +1118,7 @@ snow spcs service drop nginx \
 ```
 
 > [!NOTE]
-> Since Snowpark Container Services has compute associated with it, run the [clean up](https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql) script to clean the resources created as part of this cheatsheet.
+> SPCS has compute associated with it, run the [clean up](https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql) script to clean the Snowflake resources created as part of this cheatsheet.
 >
 > ```shell
 > curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql |
@@ -1091,9 +1149,7 @@ snow spcs service drop nginx \
 - [Snowpark Container Services Tutorial](https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview-tutorials)
 
 [^1]: https://docs.snowflake.com/developer-guide/snowflake-cli-v2/connecting/specify-credentials#how-to-use-environment-variables-for-snowflake-credentials
-[^2]: https://github.com/snowflakedb/native-apps-templates
-[^3]: https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool
-
-```
-
-```
+[^2]: https://docs.snowflake.com/en/sql-reference/sql/execute-immediate
+[^3]: https://github.com/snowflakedb/native-apps-templates
+[^4]: https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool
+[^5]: https://docs.snowflake.com/en/developer-guide/snowpark-container-services/specification-reference
