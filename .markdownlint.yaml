@@ -10,3 +10,4 @@ line-length:
   stern: false
 no-inline-html: false
 no-bare-urls: false
+no-duplicate-heading: false
