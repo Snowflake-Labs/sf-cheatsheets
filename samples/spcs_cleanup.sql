@@ -1,0 +1,12 @@
+USE ROLE cheatsheets_spcs_demo_role;
+
+DROP DATABASE CHEATSHEETS_DB;
+
+USE ROLE ACCOUNTADMIN;
+
+ALTER COMPUTE POOL my_xs_compute_pool STOP ALL;
+DROP COMPUTE POOL my_xs_compute_pool;
+
+USE ROLE ACCOUNTADMIN;
+
+ALTER WAREHOUSE cheatsheets_spcs_wh_s SUSPEND;
