@@ -106,7 +106,124 @@ snow connection test -c cheatsheets
 > If you don't specify `-c`, then it test with default connection that was set in
 > the config
 
-## Manipulating Snowflake Objects
+## Cortex
+
+Supported LLMs[^2]
+
+- Large
+  - reka-core
+  - llama3-70b
+  - mistral-large
+- Medium
+  - snowflake-arctic(**default**)
+  - reka-flash
+  - mixtral-8x7b
+  - llama2-70b-chat
+- Small
+  - llama3-8b
+  - mistral-7b
+  - gemma-7b
+
+## Complete
+
+Generate a response for a given prompt,
+
+```shell
+snow cortex complete "Tell me about Snowflake"
+```
+
+With a specific supported LLM,
+
+```shell
+snow cortex complete "Tell me about Snowflake" --model=mistral-7b
+```
+
+With history,
+
+```shell
+snow cortex complete --file samples/datacloud.json
+```
+
+## Extract Answer
+
+Get answer for the question from a text,
+
+```shell
+snow cortex extract-answer 'what does snowpark do ?' 'Snowpark provides a set of libraries and runtimes in Snowflake to securely deploy and process non-SQL code, including Python, Java and Scala.'
+```
+
+Get answers for the questions from a text file,
+
+```shell
+snow cortex extract-answer 'What does Snowflake eliminate?'  --file samples/answers.txt
+```
+
+```shell
+snow cortex extract-answer 'What non-SQL code Snowpark process?'  --file samples/answers.txt
+```
+
+## Sentiment
+
+| Sentiment Score | Sentiment |
+| :-------------: | :-------: |
+|        1        | Positive  |
+|       -1        | Negative  |
+
+A positive sentiment (score: `0.64`) from a text,
+
+```shell
+snow cortex sentiment 'Snowflake is a awesome company to work.'
+```
+
+A negative sentiment ( approx score `-0.4` ) from a text,
+
+```shell
+snow cortex sentiment --file samples/sentiment.txt
+```
+
+## Summarize
+
+From a text,
+
+```shell
+snow cortex summarize 'SnowCLI is next gen command line utility to interact with Snowflake. It supports manipulating lot of Snowflake objects from command line.'
+```
+
+From a file,
+
+```shell
+snow cortex summarize --file samples/asl_v2.txt
+```
+
+## Translate
+
+Currently supported languages
+
+- English(`en`)
+- French(`fr`)
+- German(`de`)
+- Polish(`pl`)
+- Japanese(`jp`)
+- Korean(`ko`)
+- Italian(`it`)
+- Portuguese(`pt`)
+- Spanish(`es`)
+- Swedish(`sv`)
+- Russian(`rs`)
+
+Translate from English to French a text,
+
+```shell
+snow cortex translate --from en --to fr 'snowflake is an awesome company to work for.'
+```
+
+Translate from English to Spanish a text from a file,
+
+```shell
+snow cortex translate --from en --to es --file samples/translate.txt
+```
+
+## Work with Snowflake Objects using SQL
 
 ### Creating Objects
 
@@ -292,7 +409,9 @@ Drop a streamlit application named `streamlit_app` in schema of `public` of data
 snow streamlit drop streamlit_app --schema=public --database=my_streamlit_app
 ```
 
-## Internal Stages
+## Stages
+
+SnowCLI allows managing the internal stages.
 
 ### Create
 
@@ -372,7 +491,7 @@ Copy `load_employees.sql` to stage `cli_stage` at path `/sql`,
 snow stage copy load_employees.sql '@cli_stage/sql'  --schema=cli --database=foo
 ```
 
-Execute the SQL[^2] from stage,
+Execute the SQL[^3] from stage,
 
 ```shell
 snow stage execute '@cli_stage/sql/load_employees.sql'  --schema=cli --database=foo
@@ -412,6 +531,13 @@ Executing `variables.sql` would have created a view named `EMPLOYEE_DEPT_VIEW`, 
 snow object list view --like 'emp%' --database=foo --schema=cli
 ```
 
+> [!NOTE]
+> SnowCLI allows processing templating using `{{...}}` and `&{...}`
+>
+> - `{{...}}` is a preferred templating i.g Jinja templating for server side processing
+> - `&{...}` is a preferred templating for client side processing
+> - All client side context variables can be accessed using `&{ctx.env.<var>}` e.g. `&{ctx.env.USER}` returns the current OS user
+
 ### Remove File(s) from Stage
 
 Remove all files from stage `cli_stage` on path `/data`
@@ -440,7 +566,7 @@ snow app init --name 'my-first-app' my_first_app
 > Since the name becomes a part of the application URL its recommended to have URL
 > safe names
 
-Create a Snowflake Native App with Streamlit Python template[^3]
+Create a Snowflake Native App with Streamlit Python template[^4]
 
 ```shell
 snow app init my_first_app --template streamlit-python
@@ -452,7 +578,7 @@ snow app init my_first_app --template streamlit-python
 
 ### Run App
 
-From the application directory e.g. `my_first_app`
+From the application directory i.e. `cd my_first_app`
 
 ```shell
 snow app run
@@ -461,7 +587,7 @@ snow app run
 ### Version App
 
 > ![IMPORTANT]
-> The version name should be valid SQL identifier e.g. no dots and start with a character
+> The version name should be valid SQL identifier i.e. no dots, no dashes and start with a character
 > usually version labels use `v`.
 
 #### Create Version
@@ -509,7 +635,7 @@ snow app run --version=v1_0 --patch=1
 
 ## Open App
 
-Open the application on a browser, from the application directory e.g. `my_first_app`
+Open the application on a browser,
 
 ```shell
 snow app open
@@ -517,7 +643,7 @@ snow app open
 
 ## Deploy
 
-Synchronize the local application file changes with stage and don't create/update the running application
+Synchronize the local application file changes with stage and don't create/update the running application,
 
 ```shell
 snow app deploy
@@ -557,7 +683,7 @@ snow app teardown --cascade
 
 ### Compute Pool
 
-List of available instance families[^4]
+List of available instance families[^5]
 
 - CPU_X64_XS
 - CPU_X64_S
@@ -874,7 +1000,7 @@ snow spcs image-repository drop my_image_repository \
 
 ### Services
 
-Create a SPCS service specification[^5] file,
+Create a SPCS service specification[^6] file,
 
 > [!TIP]
 > Tools like [jq](https://jqlang.github.io/jq/) can help extract data from the command output
@@ -1135,6 +1261,8 @@ snow spcs service drop nginx \
 - [Snowflake Developers::Getting Started With Snowflake CLI](https://youtu.be/ooyZh56NePA?si=3yV3s2z9YwPWVJc-)
 - [Intro to Snowpark Container Services](https://quickstarts.snowflake.com/guide/intro_to_snowpark_container_services/index.html?index=../..index#0)
 - [Build a Data App and run it on Snowpark Container Services](https://quickstarts.snowflake.com/guide/build_a_data_app_and_run_it_on_Snowpark_container_services/index.html?index=../..index#0)
+- [Build Rag Based Equipment Maintenance App Using Snowflake Cortex](https://quickstarts.snowflake.com/guide/build_rag_based_equipment_maintenance_app_using_snowflake_cortex/index.html?index=../..index#0)
+- [Build a Retrieval Augmented Generation (RAG) based LLM assistant using Streamlit and Snowflake Cortex](https://quickstarts.snowflake.com/guide/asking_questions_to_your_own_documents_with_snowflake_cortex/index.html?index=../..index#1)
 
 ### Documentation
 
@@ -1142,6 +1270,7 @@ snow spcs service drop nginx \
 - [Execute Immediate Jinja Templating](https://docs.snowflake.com/en/sql-reference/sql/execute-immediate-from)
 - [Snowpark Native App Framework](https://docs.snowflake.com/en/developer-guide/native-apps/native-apps-about)
 - [Snowpark Container Services](https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview)
+- [Snowflake Cortex LLM Functions](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions)
 
 ### Tutorials
 
@@ -1149,7 +1278,8 @@ snow spcs service drop nginx \
 - [Snowpark Container Services Tutorial](https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview-tutorials)
 
 [^1]: https://docs.snowflake.com/developer-guide/snowflake-cli-v2/connecting/specify-credentials#how-to-use-environment-variables-for-snowflake-credentials
-[^2]: https://docs.snowflake.com/en/sql-reference/sql/execute-immediate
-[^3]: https://github.com/snowflakedb/native-apps-templates
-[^4]: https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool
-[^5]: https://docs.snowflake.com/en/developer-guide/snowpark-container-services/specification-reference
+[^2]: https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#choosing-a-model
+[^3]: https://docs.snowflake.com/en/sql-reference/sql/execute-immediate
+[^4]: https://github.com/snowflakedb/native-apps-templates
+[^5]: https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool
+[^6]: https://docs.snowflake.com/en/developer-guide/snowpark-container-services/specification-reference

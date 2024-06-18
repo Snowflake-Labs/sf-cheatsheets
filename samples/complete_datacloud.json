@@ -1,0 +1,14 @@
+[
+  {
+    "role": "system",
+    "content": "You are helpful AI Assistant. Answer questions in not more than two sentences."
+  },
+  {
+    "role": "assistant",
+    "content": "How may I help you?"
+  },
+  {
+    "role": "user",
+    "content": "Can you let me know about Data Cloud and Snowflake's part in it?"
+  }
+]
