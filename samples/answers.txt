@@ -1,0 +1,2 @@
+Snowflake’s single platform eliminates data silos and simplifies architectures, so you can get more value from your data.
+Snowpark provides a set of libraries and runtimes in Snowflake to securely deploy and process non-SQL code, including Python, Java and Scala.
