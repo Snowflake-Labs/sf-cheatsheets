@@ -223,7 +223,7 @@ Translate from English to Spanish a text from a file,
 snow cortex translate --from en --to es --file samples/translate.txt
 ```
 
-## Manipulating Snowflake Objects
+## Work with Snowflake Objects using SQL
 
 ### Creating Objects
 
@@ -409,7 +409,9 @@ Drop a streamlit application named `streamlit_app` in schema of `public` of data
 snow streamlit drop streamlit_app --schema=public --database=my_streamlit_app
 ```
 
-## Internal Stages
+## Stages
+
+SnowCLI allows managing the internal stages.
 
 ### Create
 
@@ -529,6 +531,13 @@ Executing `variables.sql` would have created a view named `EMPLOYEE_DEPT_VIEW`, 
 snow object list view --like 'emp%' --database=foo --schema=cli
 ```
 
+> [!NOTE]
+> SnowCLI allows processing templating using `{{...}}` and `&{...}`
+>
+> - `{{...}}` is a preferred templating i.g Jinja templating for server side processing
+> - `&{...}` is a preferred templating for client side processing
+> - All client side context variables can be accessed using `&{ctx.env.<var>}` e.g. `&{ctx.env.USER}` returns the current OS user
+
 ### Remove File(s) from Stage
 
 Remove all files from stage `cli_stage` on path `/data`
@@ -569,7 +578,7 @@ snow app init my_first_app --template streamlit-python
 
 ### Run App
 
-From the application directory e.g. `my_first_app`
+From the application directory i.e. `cd my_first_app`
 
 ```shell
 snow app run
@@ -578,7 +587,7 @@ snow app run
 ### Version App
 
 > ![IMPORTANT]
-> The version name should be valid SQL identifier e.g. no dots and start with a character
+> The version name should be valid SQL identifier i.e. no dots, no dashes and start with a character
 > usually version labels use `v`.
 
 #### Create Version
@@ -626,7 +635,7 @@ snow app run --version=v1_0 --patch=1
 
 ## Open App
 
-Open the application on a browser, from the application directory e.g. `my_first_app`
+Open the application on a browser,
 
 ```shell
 snow app open
@@ -634,7 +643,7 @@ snow app open
 
 ## Deploy
 
-Synchronize the local application file changes with stage and don't create/update the running application
+Synchronize the local application file changes with stage and don't create/update the running application,
 
 ```shell
 snow app deploy
