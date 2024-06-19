@@ -203,13 +203,13 @@ Currently supported languages
 - French(`fr`)
 - German(`de`)
 - Polish(`pl`)
-- Japanese(`jp`)
+- Japanese(`ja`)
 - Korean(`ko`)
 - Italian(`it`)
 - Portuguese(`pt`)
 - Spanish(`es`)
 - Swedish(`sv`)
-- Russian(`rs`)
+- Russian(`ru`)
 
 Translate from English to French a text,
 
