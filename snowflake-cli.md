@@ -613,7 +613,7 @@ snow app version list
 #### Drop a Version
 
 ```shell
-snow app version list v1_0
+snow app version drop v1_0
 ```
 
 #### Deploy a Version
