@@ -26,12 +26,6 @@ CREATE WAREHOUSE IF NOT EXISTS cheatsheets_spcs_wh_s WITH
 -- grants on warehouse to cheatsheets_spcs_demo_role
 GRANT USAGE ON WAREHOUSE cheatsheets_spcs_wh_s TO ROLE cheatsheets_spcs_demo_role;
 
--- security integration to allow accessing service via endpoint
-CREATE SECURITY INTEGRATION IF NOT EXISTS snowservices_ingress_oauth
-  TYPE=oauth
-  OAUTH_CLIENT=snowservices_ingress
-  ENABLED=true;
-
 -- allow endpoint binding to role 
 GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO ROLE cheatsheets_spcs_demo_role;
 
