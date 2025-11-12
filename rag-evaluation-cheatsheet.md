@@ -2,6 +2,7 @@
 title: "RAG Evaluation Cheatsheet"
 description: "A compact guide to evaluating Retrieval-Augmented Generation (RAG) systems using core metrics: Groundedness, Context Relevance, and Answer Relevance."
 tags: ["RAG", "LLM Evaluation", "TruLens", "Prompt Engineering", "AI Quality"]
+version: v1.0
 ---
 
 # 🧭 **RAG Evaluation Cheatsheet**
