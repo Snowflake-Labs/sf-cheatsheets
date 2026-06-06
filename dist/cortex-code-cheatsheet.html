@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-06-06" />
+  <title>cortex-code-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">cortex-code-cheatsheet</h1>
+<p class="date">2026-06-06</p>
+</header>
+<h1 id="cortex-code-coco-developer-cheatsheet">Cortex Code (CoCo) —
+Developer Cheatsheet</h1>
+<blockquote>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-cli">Cortex
+Code CLI docs</a>.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#start-here-by-role">Start Here By Role</a></li>
+<li><a href="#the-7-trigger-characters">The 7 Trigger
+Characters</a></li>
+<li><a href="#slash-commands-youll-actually-use">Slash Commands You’ll
+Actually Use</a></li>
+<li><a href="#keyboard-shortcuts-that-matter">Keyboard Shortcuts That
+Matter</a></li>
+<li><a href="#working-with-your-codebase">Working with Your
+Codebase</a></li>
+<li><a href="#snowflake-data-shortcuts">Snowflake Data
+Shortcuts</a></li>
+<li><a href="#agent-modes">Agent Modes</a></li>
+<li><a href="#skills">Skills</a></li>
+<li><a href="#scheduling">Scheduling</a></li>
+<li><a href="#memory-across-sessions">Memory Across Sessions</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#settings-worth-knowing">Settings Worth Knowing</a></li>
+<li><a href="#cli-subcommands">CLI Subcommands</a></li>
+<li><a href="#mcp-integration">MCP Integration</a></li>
+<li><a href="#hooks">Hooks</a></li>
+<li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
+<li><a href="#further-reading">Further Reading</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="quick-start">Quick Start</h2>
+<p>Install on macOS/Linux:</p>
+<pre class="shell"><code># run in terminal
+curl -sL https://sfc-repo.snowflakecomputing.com/cortex/install.sh | bash</code></pre>
+<p>Common launch options:</p>
+<pre class="shell"><code># run in terminal
+cortex                                                          # launch in current directory
+cortex -c my_connection -w /path/to/project                     # set connection and working dir
+cortex --continue                                               # resume last session
+cortex -p &quot;list all Python files&quot; --output-format stream-json   # one-off prompt (scripting)</code></pre>
+<h2 id="start-here-by-role">Start Here By Role</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>If you’re a…</th>
+<th>Focus on</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>DB / Data Developer</strong></td>
+<td><code>#TABLE</code>, <code>/sql</code>,
+<code>cortex search table-details</code>, Semantic Views, SQL
+timeout</td>
+</tr>
+<tr class="even">
+<td><strong>App Developer</strong> (Streamlit, Native Apps)</td>
+<td><code>@{file}</code>, <code>/diff</code>, <code>/worktree</code>,
+<code>$snowflake-apps</code>, <code>$deploy-to-spcs</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Data / ML Engineer</strong></td>
+<td><code>/lineage</code>, <code>$machine-learning</code>,
+<code>$cortex-agent</code>, <code>$dynamic-tables</code>, fdbt</td>
+</tr>
+<tr class="even">
+<td><strong>Platform / Infra</strong></td>
+<td><code>/plan</code>, <code>/team</code>, <code>/bg</code>, Hooks,
+MCP, Scheduling, Memory</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-7-trigger-characters">The 7 Trigger Characters</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Trigger</th>
+<th>Name</th>
+<th>What it does</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/</code></td>
+<td>Slash command</td>
+<td>Invoke a slash command</td>
+<td><code>/sql SELECT current_user()</code></td>
+</tr>
+<tr class="even">
+<td><code>!</code></td>
+<td>Bash shell</td>
+<td>Run a terminal command inline</td>
+<td><code>! git status</code></td>
+</tr>
+<tr class="odd">
+<td><code>@</code></td>
+<td>File reference</td>
+<td>Reference a file by path (no inject)</td>
+<td><code>@src/app.py review this</code></td>
+</tr>
+<tr class="even">
+<td><code>@{</code></td>
+<td>File inject</td>
+<td>Inject full file contents into prompt</td>
+<td><code>@{schema.sql} write tests</code></td>
+</tr>
+<tr class="odd">
+<td><code>#</code></td>
+<td>Table reference</td>
+<td>Autocomplete table name, load schema</td>
+<td><code>#DB.PUBLIC.ORDERS summarize</code></td>
+</tr>
+<tr class="even">
+<td><code>$</code></td>
+<td>Skill invoke</td>
+<td>Invoke a skill by name</td>
+<td><code>$semantic-view create a view for sales</code></td>
+</tr>
+<tr class="odd">
+<td><code>%</code></td>
+<td>Agent mention</td>
+<td>Mention a Cortex Agent</td>
+<td><code>%my_sales_agent what was Q1 revenue?</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!TIP] <code>@{file}</code> is the most useful trigger for
+developers: inject a config, schema, or source file into context without
+manually copying content.</p>
+</blockquote>
+<h2 id="slash-commands-youll-actually-use">Slash Commands You’ll
+Actually Use</h2>
+<p><strong>Execution &amp; modes:</strong></p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/plan</code> / <code>Ctrl+P</code></td>
+<td>Enter plan mode — CoCo presents a plan before making changes</td>
+</tr>
+<tr class="even">
+<td><code>/bypass</code></td>
+<td>Auto-approve all tool calls</td>
+</tr>
+<tr class="odd">
+<td><code>/team</code> / <code>Ctrl+G</code></td>
+<td>Enable parallel teammates mode</td>
+</tr>
+<tr class="even">
+<td><code>/bg</code></td>
+<td>Launch a background agent, keep chatting</td>
+</tr>
+<tr class="odd">
+<td><code>/agents</code></td>
+<td>View and manage running subagents</td>
+</tr>
+</tbody>
+</table>
+<p><strong>SQL &amp; data:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/sql &lt;query&gt;</code></td>
+<td>Execute SQL inline (<code>--limit N</code> for row cap)</td>
+</tr>
+<tr class="even">
+<td><code>/sql-readonly</code></td>
+<td>Toggle SQL write protection</td>
+</tr>
+<tr class="odd">
+<td><code>/table</code></td>
+<td>Open interactive table viewer</td>
+</tr>
+<tr class="even">
+<td><code>/connections</code></td>
+<td>Manage Snowflake connections</td>
+</tr>
+<tr class="odd">
+<td><code>/doctor</code></td>
+<td>Diagnose connection issues</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Code &amp; git:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>/diff</code></td>
+<td>Review git changes fullscreen (<code>--staged</code> for
+staged)</td>
+</tr>
+<tr class="even">
+<td><code>/worktree &lt;create\|list\|switch\|delete&gt;</code></td>
+<td>Manage git worktrees</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Skills &amp; config:</strong> <code>/skill</code>
+<code>/rules</code> <code>/hooks</code> <code>/mcp</code>
+<code>/settings</code> <code>/permissions</code></p>
+<p><strong>Utilities:</strong> <code>/copy</code> <code>/share</code>
+<code>/secrets</code> <code>/compact</code> <code>/rewind</code>
+<code>/new</code> <code>/resume</code> <code>/fork</code>
+<code>/index</code> <code>/tgrep</code></p>
+<h2 id="keyboard-shortcuts-that-matter">Keyboard Shortcuts That
+Matter</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Ctrl+P</code></td>
+<td>Toggle plan mode</td>
+</tr>
+<tr class="even">
+<td><code>Ctrl+G</code></td>
+<td>Toggle team mode</td>
+</tr>
+<tr class="odd">
+<td><code>Ctrl+S</code></td>
+<td>Open subagent picker</td>
+</tr>
+<tr class="even">
+<td><code>Ctrl+O</code></td>
+<td>Cycle view mode (compact → expanded → transcript)</td>
+</tr>
+<tr class="odd">
+<td><code>Ctrl+T</code></td>
+<td>Open table viewer</td>
+</tr>
+<tr class="even">
+<td><code>Ctrl+C</code></td>
+<td>Interrupt / cancel</td>
+</tr>
+<tr class="odd">
+<td><code>Alt+T</code></td>
+<td>Open/close fullscreen task viewer</td>
+</tr>
+<tr class="even">
+<td><code>Shift+Tab</code></td>
+<td>Cycle permission level (Confirm → Plan → Bypass)</td>
+</tr>
+<tr class="odd">
+<td><code>Ctrl+R</code></td>
+<td>History search (reverse)</td>
+</tr>
+<tr class="even">
+<td><code>Ctrl+J</code></td>
+<td>Insert newline in input (for multiline prompts)</td>
+</tr>
+<tr class="odd">
+<td><code>Esc Esc</code></td>
+<td>Clear entire input</td>
+</tr>
+<tr class="even">
+<td><code>Ctrl+A</code></td>
+<td>Move to start of input</td>
+</tr>
+<tr class="odd">
+<td><code>Ctrl+E</code></td>
+<td>Move to end of input</td>
+</tr>
+</tbody>
+</table>
+<h2 id="working-with-your-codebase">Working with Your Codebase</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Trigger</th>
+<th>Example</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>@file</code></td>
+<td><code>@src/auth.py what does this do?</code></td>
+<td>References the path (no content injection)</td>
+</tr>
+<tr class="even">
+<td><code>@{file}</code></td>
+<td><code>@{schema.sql} write tests for this</code></td>
+<td>Injects full file contents into context</td>
+</tr>
+<tr class="odd">
+<td><code>@{f1} @{f2}</code></td>
+<td><code>@{schema.sql} @{models.py} do these match?</code></td>
+<td>Inject multiple files at once</td>
+</tr>
+</tbody>
+</table>
+<p>For semantic code search: <code>/tgrep status</code> to check,
+<code>/index --rebuild</code> after major changes.</p>
+<p>Ask naturally — CoCo uses tgrep internally:
+<code>&quot;find where authentication errors are handled&quot;</code></p>
+<h2 id="snowflake-data-shortcuts">Snowflake Data Shortcuts</h2>
+<p>Reference a table to load its schema instantly:</p>
+<pre class="text"><code>#SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS how many orders this year?</code></pre>
+<p>Run SQL (use <code>Ctrl+J</code> for newlines in multiline
+queries):</p>
+<pre class="text"><code>/sql SELECT COUNT(*), SUM(O_TOTALPRICE) FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS
+     WHERE O_ORDERDATE &gt;= &#39;1995-01-01&#39;
+/sql SELECT O_ORDERSTATUS, COUNT(*) AS cnt
+     FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS GROUP BY 1
+/sql SELECT * FROM SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.CUSTOMER --limit 10</code></pre>
+<p>Discover objects and check docs before writing queries:</p>
+<pre class="shell"><code># run in terminal
+cortex search object &quot;TPCH orders&quot;
+cortex search table-details &quot;SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS&quot;
+cortex search docs &quot;dynamic tables target lag&quot;
+cortex lineage SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS --direction downstream --tree</code></pre>
+<p>Or from within CoCo:
+<code>!cortex search table-details &quot;SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS&quot;</code></p>
+<p><code>SNOWFLAKE_SAMPLE_DATA</code> is in every Snowflake account (no
+setup). Other schemas: <code>TPCDS_SF10TCL</code> (retail),
+<code>WEATHER</code>.</p>
+<h2 id="agent-modes">Agent Modes</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>How to activate</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Plan</strong></td>
+<td><code>/plan</code> or <code>Ctrl+P</code></td>
+<td>Any multi-file or risky change — CoCo drafts a plan before touching
+anything</td>
+</tr>
+<tr class="even">
+<td><strong>Bypass</strong></td>
+<td><code>/bypass</code> or <code>Shift+Tab</code></td>
+<td>Auto-approve all tool calls (careful on prod)</td>
+</tr>
+<tr class="odd">
+<td><strong>Team</strong></td>
+<td><code>/team</code> or <code>Ctrl+G</code></td>
+<td>Spawn parallel agents for large tasks</td>
+</tr>
+<tr class="even">
+<td><strong>Background</strong></td>
+<td><code>/bg</code></td>
+<td>Fire off a task, keep chatting; results arrive as a
+notification</td>
+</tr>
+</tbody>
+</table>
+<p>Git worktrees for parallel safe work:
+<code>/worktree create &lt;branch&gt;</code> gives each agent its own
+branch.</p>
+<h2 id="skills">Skills</h2>
+<p>Invoke with <code>$</code> prefix in the CoCo prompt:
+<code>$cortex-agent build a Q&amp;A agent over my warehouse</code></p>
+<p><strong>Manage:</strong></p>
+<pre class="text"><code>/skill              # browse installed skills
+/skill list         # list all</code></pre>
+<pre class="shell"><code># run in terminal
+cortex skill list
+cortex skill find &quot;&lt;query&gt;&quot;
+cortex skill add &lt;name&gt;</code></pre>
+<p>Custom skills: place a <code>.md</code> file in
+<code>.cortex/skills/</code> (project) or
+<code>~/.snowflake/cortex/skills/</code> (global).</p>
+<p><strong>Bundled skills:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Skill</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$cortex-agent</code></td>
+<td>Build, debug, deploy Cortex Agents</td>
+</tr>
+<tr class="even">
+<td><code>$semantic-view</code></td>
+<td>Create/manage semantic views for Cortex Analyst</td>
+</tr>
+<tr class="odd">
+<td><code>$snowflake-apps</code></td>
+<td>Scaffold and deploy Snowflake App Runtime apps</td>
+</tr>
+<tr class="even">
+<td><code>$deploy-to-spcs</code></td>
+<td>Deploy containers to Snowpark Container Services</td>
+</tr>
+<tr class="odd">
+<td><code>$machine-learning</code></td>
+<td>Train models, use Model Registry, run ML jobs</td>
+</tr>
+<tr class="even">
+<td><code>$dynamic-tables</code></td>
+<td>Build incremental pipelines with Dynamic Tables</td>
+</tr>
+<tr class="odd">
+<td><code>$lineage</code></td>
+<td>Trace upstream/downstream column-level lineage</td>
+</tr>
+<tr class="even">
+<td><code>$warehouse</code></td>
+<td>Analyze and right-size warehouse costs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scheduling">Scheduling</h2>
+<pre class="text"><code>/loop                        # interactive scheduler
+/loop &quot;every day at 9am&quot;     # natural language
+/loop &quot;0 9 * * 1-5&quot;          # standard cron (Mon–Fri 9am)
+/automation                  # schedule a recurring agent task</code></pre>
+<blockquote>
+<p>[!NOTE] Scheduled tasks are session-scoped and expire after 3 days.
+Max 50 per session.</p>
+</blockquote>
+<h2 id="memory-across-sessions">Memory Across Sessions</h2>
+<p>Enable once, then memories persist across every CoCo session.</p>
+<pre class="shell"><code># run in terminal — enable memory (pick one)
+export CORTEX_ENABLE_MEMORY=1        # environment variable
+# or set in ~/.snowflake/cortex/settings.json: &quot;enableMemory&quot;: true</code></pre>
+<p><strong>remember</strong> — save something CoCo should know in every
+future session:</p>
+<pre class="text"><code>cortex memory remember &quot;use conventional commits: feat:, fix:, docs:, chore:, refactor:, test:&quot;
+cortex memory remember &quot;production db is read-only, use role PROD_READ for queries&quot;
+cortex memory remember &quot;default warehouse is COMPUTE_WH_M, only use XL for full-table scans&quot;
+cortex memory remember &quot;prefer async/await over .then() in this codebase&quot;</code></pre>
+<p><strong>recall</strong> — find a specific memory by topic:</p>
+<pre class="text"><code>cortex memory recall &quot;commit format&quot;
+cortex memory recall &quot;production access&quot;
+cortex memory recall &quot;warehouse sizing&quot;</code></pre>
+<p><strong>list / drop</strong> — manage stored memories:</p>
+<pre class="text"><code>cortex memory list               # show all memories with IDs
+cortex memory drop &lt;id&gt;          # remove a specific memory by ID</code></pre>
+<blockquote>
+<p>[!TIP] Natural language works too: * Say “remember that we deploy to
+us-east-1” and CoCo stores it. * Say “what’s our commit convention?” and
+CoCo recalls it from memory without a command.</p>
+</blockquote>
+<h2 id="environment-variables">Environment Variables</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CORTEX_ENABLE_MEMORY</code></td>
+<td>Enable cross-session memory (alternative to settings)</td>
+</tr>
+<tr class="even">
+<td><code>COCO_DISABLE_CRON</code></td>
+<td>Disable <code>/loop</code> and all scheduling tools</td>
+</tr>
+<tr class="odd">
+<td><code>COCO_DISABLE_ROUTINES</code></td>
+<td>Disable routines</td>
+</tr>
+<tr class="even">
+<td><code>CORTEX_CODE_STREAMING</code></td>
+<td>Enable code streaming</td>
+</tr>
+<tr class="odd">
+<td><code>CORTEX_AGENT_USE_LOCAL_ORCHESTRATOR</code></td>
+<td>Use local orchestrator (developer/debug mode)</td>
+</tr>
+<tr class="even">
+<td><code>CTX_STEP_ENFORCEMENT</code></td>
+<td>Enforce ctx step tracking discipline</td>
+</tr>
+<tr class="odd">
+<td><code>CORTEX_BROWSER_HEADLESS</code></td>
+<td>Run browser automation without a visible window</td>
+</tr>
+<tr class="even">
+<td><code>CORTEX_CODE_ENABLE_SNOWFLAKE_MANAGED_MCP_SERVERS</code></td>
+<td>Enable Snowflake-managed MCP servers</td>
+</tr>
+<tr class="odd">
+<td><code>CORTEX_DISABLE_TODO_TOOL</code></td>
+<td>Disable the todo/task tool</td>
+</tr>
+</tbody>
+</table>
+<h2 id="settings-worth-knowing">Settings Worth Knowing</h2>
+<p>Configure via <code>/settings</code> or edit
+<code>~/.snowflake/cortex/settings.json</code>.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Key</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>agentMode</code></td>
+<td><code>standard</code></td>
+<td>Agent behavior profile (<code>standard</code> or
+<code>code</code>)</td>
+</tr>
+<tr class="even">
+<td><code>autoAcceptPlans</code></td>
+<td><code>false</code></td>
+<td>Skip the “approve plan?” prompt</td>
+</tr>
+<tr class="odd">
+<td><code>enableMemory</code></td>
+<td><code>false</code></td>
+<td>Enable cross-session memory</td>
+</tr>
+<tr class="even">
+<td><code>tgrepEnabled</code></td>
+<td><code>true</code></td>
+<td>Enable semantic code search</td>
+</tr>
+<tr class="odd">
+<td><code>sqlDefaultTimeoutSeconds</code></td>
+<td><code>180</code></td>
+<td>Max wait for SQL queries</td>
+</tr>
+<tr class="even">
+<td><code>diffDisplayMode</code></td>
+<td><code>unified</code></td>
+<td><code>unified</code> (git-style) or <code>side_by_side</code></td>
+</tr>
+<tr class="odd">
+<td><code>bashDefaultTimeoutMs</code></td>
+<td><code>180000</code></td>
+<td>Timeout for shell commands</td>
+</tr>
+<tr class="even">
+<td><code>mcpWait</code></td>
+<td><code>false</code></td>
+<td>Wait for all MCP servers before starting (useful in CI)</td>
+</tr>
+<tr class="odd">
+<td><code>disableCron</code></td>
+<td><code>false</code></td>
+<td>Disable <code>/loop</code> scheduling</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cli-subcommands">CLI Subcommands</h2>
+<p>Run outside the interactive session — useful in scripts, CI, and
+automation.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>cortex search object &quot;&lt;query&gt;&quot;</code></td>
+<td>Find tables, views, schemas by name or description</td>
+</tr>
+<tr class="even">
+<td><code>cortex search table-details &quot;DB.SCHEMA.TABLE&quot;</code></td>
+<td>Full column metadata for a table</td>
+</tr>
+<tr class="odd">
+<td><code>cortex search docs &quot;&lt;query&gt;&quot;</code></td>
+<td>Search Snowflake product docs</td>
+</tr>
+<tr class="even">
+<td><code>cortex search marketplace &quot;&lt;query&gt;&quot;</code></td>
+<td>Search Marketplace listings</td>
+</tr>
+<tr class="odd">
+<td><code>cortex lineage DB.SCHEMA.TABLE --direction both --tree</code></td>
+<td>Trace upstream and downstream lineage</td>
+</tr>
+<tr class="even">
+<td><code>cortex connections list</code></td>
+<td>List available connections</td>
+</tr>
+<tr class="odd">
+<td><code>cortex connections set &lt;name&gt;</code></td>
+<td>Switch active connection</td>
+</tr>
+<tr class="even">
+<td><code>cortex semantic-views list</code></td>
+<td>List semantic views in the account</td>
+</tr>
+<tr class="odd">
+<td><code>cortex worktree create &lt;branch&gt;</code></td>
+<td>Create a git worktree (also available via
+<code>/worktree</code>)</td>
+</tr>
+<tr class="even">
+<td><code>cortex skill list</code></td>
+<td>List installed skills</td>
+</tr>
+<tr class="odd">
+<td><code>cortex memory remember &quot;&lt;text&gt;&quot;</code></td>
+<td>Store a memory (requires <code>enableMemory: true</code>)</td>
+</tr>
+<tr class="even">
+<td><code>cortex update</code></td>
+<td>Update to the latest version</td>
+</tr>
+</tbody>
+</table>
+<p>For the full command list: <a href="https://docs.snowflake.com/en/user-guide/cortex-code/cli-reference">CLI
+Reference</a></p>
+<h2 id="mcp-integration">MCP Integration</h2>
+<p>Config file: <code>~/.snowflake/cortex/mcp.json</code> | Manage:
+<code>cortex mcp add | list | remove</code> | In-session:
+<code>/mcp</code></p>
+<p>Tool naming inside CoCo:
+<code>mcp__&lt;server&gt;__&lt;tool&gt;</code>
+(e.g. <code>mcp__github__create_pull_request</code>)</p>
+<p>Supported transports: <code>http</code>, <code>sse</code>,
+<code>stdio</code></p>
+<p><strong>Add a server (example: GitHub):</strong></p>
+<pre class="shell"><code># run in terminal
+cortex mcp add
+# ↳ transport=stdio, command=npx, args=-y @modelcontextprotocol/server-github
+# ↳ env: GITHUB_PERSONAL_ACCESS_TOKEN=&lt;your-token&gt;</code></pre>
+<p>Other popular servers (all via
+<code>npx -y @modelcontextprotocol/server-&lt;name&gt;</code>):
+<code>filesystem</code>, <code>postgres</code>,
+<code>brave-search</code>, <code>slack</code></p>
+<p>Set <code>mcpWait: true</code> in settings if MCP tools must be ready
+before the first prompt (CI/automation).</p>
+<p>For setup details: <a href="https://docs.snowflake.com/en/user-guide/cortex-code/extensibility">MCP
+docs</a></p>
+<h2 id="hooks">Hooks</h2>
+<p>Hooks fire shell scripts in response to lifecycle events. Configure
+in <code>~/.snowflake/cortex/hooks/</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Event</th>
+<th>When it fires</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>UserPromptSubmit</code></td>
+<td>User submits a prompt</td>
+</tr>
+<tr class="even">
+<td><code>PreToolUse</code></td>
+<td>Before any tool call</td>
+</tr>
+<tr class="odd">
+<td><code>PostToolUse</code></td>
+<td>After any tool call</td>
+</tr>
+<tr class="even">
+<td><code>PermissionRequest</code></td>
+<td>When a permission prompt appears</td>
+</tr>
+<tr class="odd">
+<td><code>Stop</code></td>
+<td>Agent stops</td>
+</tr>
+<tr class="even">
+<td><code>SessionStart</code></td>
+<td>Session begins</td>
+</tr>
+<tr class="odd">
+<td><code>SessionEnd</code></td>
+<td>Session ends</td>
+</tr>
+<tr class="even">
+<td><code>PreCompact</code></td>
+<td>Before conversation compaction</td>
+</tr>
+</tbody>
+</table>
+<p>View and test configured hooks:</p>
+<pre class="text"><code>/hooks</code></pre>
+<h2 id="tips-gotchas">Tips &amp; Gotchas</h2>
+<ul>
+<li><strong><code>/plan</code> before anything risky.</strong> CoCo
+reads the codebase, drafts a plan, and waits for your approval. For
+multi-file changes this is the difference between a clean refactor and a
+mess.</li>
+<li><strong><code>#TABLE</code> loads schema automatically.</strong>
+Type <code>#</code> then the table name — CoCo fetches column
+definitions before writing any SQL. No need to describe the table.</li>
+<li><strong><code>/bg</code> for long jobs.</strong> Fire off a
+background agent to run a big refactor or analysis while you keep
+chatting. Results arrive as a notification.</li>
+<li><strong><code>cortex search docs</code> is semantic.</strong> “how
+do I set target lag for dynamic tables” finds the right page faster than
+a Google search.</li>
+<li><strong>Secrets stay out of chat.</strong> Use <code>/secrets</code>
+to store API keys and tokens. CoCo injects them at runtime without
+exposing them in the session transcript.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/cortex-code-cli">Cortex
+Code CLI</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/cli-reference">CLI
+Reference (slash commands, batch mode)</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/keyboard-shortcuts">Keyboard
+Shortcuts</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/bundled-skills">Bundled
+Skills</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/settings">Settings
+Reference</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/extensibility">Extensibility
+(hooks, plugins, MCP)</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/changelog">Changelog</a></li>
+</ul>
+<h2 id="further-reading">Further Reading</h2>
+<p>Concepts behind intent-driven development and why tools like CoCo
+change how builders work:</p>
+<ul>
+<li><a href="https://blogs.kameshs.dev/infrastructure-as-intent-the-field-velocity-blueprint-e6217ef30f14">Infrastructure
+as Intent: The Field Velocity Blueprint</a></li>
+<li><a href="https://blogs.kameshs.dev/the-ghost-in-the-machine-why-ai-needs-the-spirit-of-uml-0d8864e583e2">The
+Ghost in the Machine: Why AI Needs the Spirit of UML</a></li>
+<li><a href="https://blogs.kameshs.dev/intent-driven-development-the-shift-developers-cant-ignore-ef434f94d56c">Intent-Driven
+Development: The Shift Developers Can’t Ignore</a></li>
+<li><a href="https://blogs.kameshs.dev/intent-compression-ratio-measuring-the-power-of-intent-ceb6faf2e2f9">Intent
+Compression Ratio: Measuring the Power of Intent</a></li>
+<li><a href="https://blogs.kameshs.dev/icr-and-token-economics-9a014a75b399">ICR
+and Token Economics</a></li>
+</ul>
+</body>
+</html>

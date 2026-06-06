@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2024-06-10" />
+  <title>snowflake-cli</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">snowflake-cli</h1>
+<p class="date">2024-06-10</p>
+</header>
+<h1 id="snowflake-cli">Snowflake CLI</h1>
+<p><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index">Snowflake
+CLI</a> is next gen command line utility to interact with Snowflake.</p>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>All commands has <code>--help</code> option</li>
+<li>All command allows output format to be
+<code>table</code>(<strong>default</strong>) or <code>json</code>.</li>
+</ul>
+</blockquote>
+<h2 id="install">Install</h2>
+<pre class="shell"><code>pip install -U snowflake-cli-labs</code></pre>
+<p>or</p>
+<pre class="shell"><code>pipx install snowflake-cli-labs</code></pre>
+<h2 id="get-help">Get Help</h2>
+<pre class="shell"><code>snow --help</code></pre>
+<h2 id="information">Information</h2>
+<p>General information about version of CLI and Python, default
+configuration path etc.,</p>
+<pre class="shell"><code>snow  --info</code></pre>
+<blockquote>
+<p>[!TIP] The connection configuration <code>config.toml</code> by
+default is stored under<code>$HOME/.snowflake</code>. If you wish to
+change it set the environment variable <code>$SNOWFLAKE_HOME</code><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> to director where you want to store
+the <code>config.toml</code></p>
+</blockquote>
+<h2 id="connection">Connection</h2>
+<h3 id="add">Add</h3>
+<pre class="shell"><code>snow connection add</code></pre>
+<p>Adding connection <code>cheatsheets</code> following the prompts,</p>
+<pre class="shell"><code>snow connection add</code></pre>
+<p>Adding connection using command options,</p>
+<pre class="shell"><code>snow connection add --connection-name cheatsheets \
+  --account &lt;your-account-identifier&gt; \
+  --user &lt;your-user&gt; \
+  --password &lt;your-password&gt;</code></pre>
+<blockquote>
+<p>[!NOTE] Currently need to follow the prompts for the defaults or add
+other parameters</p>
+</blockquote>
+<h2 id="list">List</h2>
+<pre class="shell"><code>snow connection list</code></pre>
+<h2 id="set-default">Set Default</h2>
+<pre class="shell"><code>snow connection set-default cheatsheets</code></pre>
+<h2 id="test-a-connection">Test a Connection</h2>
+<pre class="shell"><code>snow connection test -c cheatsheets</code></pre>
+<blockquote>
+<p>[!TIP] If you don’t specify <code>-c</code>, then it test with
+default connection that was set in the config</p>
+</blockquote>
+<h2 id="cortex">Cortex</h2>
+<p>Supported LLMs<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<ul>
+<li>Large
+<ul>
+<li>reka-core</li>
+<li>llama3-70b</li>
+<li>mistral-large</li>
+</ul></li>
+<li>Medium
+<ul>
+<li>snowflake-arctic(<strong>default</strong>)</li>
+<li>reka-flash</li>
+<li>mixtral-8x7b</li>
+<li>llama2-70b-chat</li>
+</ul></li>
+<li>Small
+<ul>
+<li>llama3-8b</li>
+<li>mistral-7b</li>
+<li>gemma-7b</li>
+</ul></li>
+</ul>
+<h2 id="complete">Complete</h2>
+<p>Generate a response for a given prompt,</p>
+<pre class="shell"><code>snow cortex complete &quot;Tell me about Snowflake&quot;</code></pre>
+<p>With a specific supported LLM,</p>
+<pre class="shell"><code>snow cortex complete &quot;Tell me about Snowflake&quot; --model=mistral-7b</code></pre>
+<p>With history,</p>
+<pre class="shell"><code>snow cortex complete --file samples/datacloud.json</code></pre>
+<h2 id="extract-answer">Extract Answer</h2>
+<p>Get answer for the question from a text,</p>
+<pre class="shell"><code>snow cortex extract-answer &#39;what does snowpark do ?&#39; &#39;Snowpark provides a set of libraries and runtimes in Snowflake to securely deploy and process non-SQL code, including Python, Java and Scala.&#39;</code></pre>
+<p>Get answers for the questions from a text file,</p>
+<pre class="shell"><code>snow cortex extract-answer &#39;What does Snowflake eliminate?&#39;  --file samples/answers.txt</code></pre>
+<pre class="shell"><code>snow cortex extract-answer &#39;What non-SQL code Snowpark process?&#39;  --file samples/answers.txt</code></pre>
+<h2 id="sentiment">Sentiment</h2>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Sentiment Score</th>
+<th style="text-align: center;">Sentiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Positive</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">-1</td>
+<td style="text-align: center;">Negative</td>
+</tr>
+</tbody>
+</table>
+<p>A positive sentiment (score: <code>0.64</code>) from a text,</p>
+<pre class="shell"><code>snow cortex sentiment &#39;Snowflake is a awesome company to work.&#39;</code></pre>
+<p>A negative sentiment ( approx score <code>-0.4</code> ) from a
+text,</p>
+<pre class="shell"><code>snow cortex sentiment --file samples/sentiment.txt</code></pre>
+<h2 id="summarize">Summarize</h2>
+<p>From a text,</p>
+<pre class="shell"><code>snow cortex summarize &#39;SnowCLI is next gen command line utility to interact with Snowflake. It supports manipulating lot of Snowflake objects from command line.&#39;</code></pre>
+<p>From a file,</p>
+<pre class="shell"><code>snow cortex summarize --file samples/asl_v2.txt</code></pre>
+<h2 id="translate">Translate</h2>
+<p>Currently supported languages</p>
+<ul>
+<li>English(<code>en</code>)</li>
+<li>French(<code>fr</code>)</li>
+<li>German(<code>de</code>)</li>
+<li>Polish(<code>pl</code>)</li>
+<li>Japanese(<code>ja</code>)</li>
+<li>Korean(<code>ko</code>)</li>
+<li>Italian(<code>it</code>)</li>
+<li>Portuguese(<code>pt</code>)</li>
+<li>Spanish(<code>es</code>)</li>
+<li>Swedish(<code>sv</code>)</li>
+<li>Russian(<code>ru</code>)</li>
+</ul>
+<p>Translate from English to French a text,</p>
+<pre class="shell"><code>snow cortex translate --from en --to fr &#39;snowflake is an awesome company to work for.&#39;</code></pre>
+<p>Translate from English to Spanish a text from a file,</p>
+<pre class="shell"><code>snow cortex translate --from en --to es --file samples/translate.txt</code></pre>
+<h2 id="work-with-snowflake-objects-using-sql">Work with Snowflake
+Objects using SQL</h2>
+<h3 id="creating-objects">Creating Objects</h3>
+<p>Simple one line query,</p>
+<pre class="shell"><code>snow sql -q &#39;CREATE DATABASE FOO&#39;</code></pre>
+<p>Loading DDL/DML commands from a file,</p>
+<pre class="shell"><code>snow sql --filename my_objects.sql</code></pre>
+<p>Using Standard Input(<code>stdin</code>)</p>
+<pre class="shell"><code>cat &lt;&lt;EOF | snow sql --stdin
+CREATE OR REPLACE DATABASE FOO;
+USE DATABASE FOO;
+CREATE OR REPLACE SCHEMA CLI;
+USE SCHEMA CLI;
+CREATE OR ALTER TABLE employees(
+  id int,
+  first_name string,
+  last_name string,
+  dept int
+);
+EOF</code></pre>
+<h3 id="listing-objects">Listing Objects</h3>
+<p>Use the following command to see the list of supported objects,</p>
+<pre class="shell"><code>snow object list --help</code></pre>
+<h4 id="warehouses">Warehouses</h4>
+<p>List all available warehouses for the current role,</p>
+<pre class="shell"><code>snow object list warehouse</code></pre>
+<h4 id="databases">Databases</h4>
+<p>List all available databases for the current role,</p>
+<pre class="shell"><code>snow object list database</code></pre>
+<p>List all databases in <code>JSON</code> format,</p>
+<pre class="shell"><code>snow object list database --format json</code></pre>
+<blockquote>
+<p>[!TIP] With <code>JSON</code> you can extract values using tools like
+<a href="https://jqlang.github.io/jq/">jq</a> e.g. to get only names of
+the databases</p>
+<pre class="shell"><code> snow object list database --format json | jq &#39;.[].name&#39;</code></pre>
+</blockquote>
+<p>List databases that starts with <code>snow</code>,</p>
+<pre class="shell"><code>snow object list database --like &#39;%snow%&#39;</code></pre>
+<h4 id="schemas">Schemas</h4>
+<p>List all schemas,</p>
+<pre class="shell"><code>snow object list schema</code></pre>
+<p>Filtering schemas by database named <code>foo</code>,</p>
+<pre class="shell"><code>snow object list schema --in database foo</code></pre>
+<h4 id="tables">Tables</h4>
+<p>List all tables</p>
+<pre class="shell"><code>snow object list table</code></pre>
+<p>List tables in a specific schema <code>cli</code> of a database
+<code>foo</code>,</p>
+<pre class="shell"><code>snow object list table --database foo --in schema cli</code></pre>
+<h3 id="describe-an-object">Describe an Object</h3>
+<p>Let us describe the table <code>employees</code> in the
+<code>foo</code> database’ schema <code>cli</code>,</p>
+<pre class="shell"><code>snow object describe table employees --database foo --schema cli</code></pre>
+<h3 id="drop-an-object">Drop an object</h3>
+<p>Drop an table named <code>employees</code> in schema <code>cli</code>
+of database <code>foo</code>,</p>
+<pre class="shell"><code>snow object drop table employees --database foo --schema cli</code></pre>
+<h2 id="streamlit-applications">Streamlit Applications</h2>
+<p>Create a <a href="https://streamlit.io">Streamlit</a> application and
+deploy to Snowflake,</p>
+<pre class="shell"><code>snow streamlit init streamlit_app</code></pre>
+<p>Create a warehouse that the Streamlit application will use,</p>
+<pre class="shell"><code>snow sql -q &#39;CREATE WAREHOUSE my_streamlit_warehouse&#39;</code></pre>
+<p>Create a database that the Streamlit application will use,</p>
+<pre class="shell"><code>snow sql -q &#39;CREATE DATABASE my_streamlit_app&#39;</code></pre>
+<h3 id="deploy-an-application">Deploy an Application</h3>
+<blockquote>
+<p>[!IMPORTANT] Ensure you are in the Streamlit application folder
+before running the command.</p>
+</blockquote>
+<pre class="shell"><code>snow streamlit deploy --database=my_streamlit_app</code></pre>
+<h3 id="list-applications">List Applications</h3>
+<p>List all available streamlit applications,</p>
+<pre class="shell"><code>snow streamlit list</code></pre>
+<h3 id="describe-application">Describe Application</h3>
+<p>Get details about a streamlit application <code>streamlit_app</code>
+in schema of <code>public</code> of
+database<code>my_streamlit_app</code>,</p>
+<pre class="shell"><code>snow streamlit describe streamlit_app --schema=public --database=my_streamlit_app</code></pre>
+<blockquote>
+<p>[!NOTE] When describing Streamlit application either provide the
+schema as parameter or use fully qualified name</p>
+</blockquote>
+<h3 id="get-application-url">Get Application URL</h3>
+<p>Get the streamlit application URL i.e. the URL used to access the
+hosted application,</p>
+<pre class="shell"><code>snow streamlit get-url streamlit_app --database=my_streamlit_app</code></pre>
+<h3 id="drop-application">Drop Application</h3>
+<p>Drop a streamlit application named <code>streamlit_app</code> in
+schema of <code>public</code> of
+database<code>my_streamlit_app</code>,</p>
+<pre class="shell"><code>snow streamlit drop streamlit_app --schema=public --database=my_streamlit_app</code></pre>
+<h2 id="stages">Stages</h2>
+<p>SnowCLI allows managing the internal stages.</p>
+<h3 id="create">Create</h3>
+<p>Create a stage named <code>cli_stage</code> in schema
+<code>cli</code> of database <code>foo</code>,</p>
+<pre class="shell"><code>snow stage create cli_stage  --schema=cli --database=foo</code></pre>
+<h3 id="describe">Describe</h3>
+<p>Get details of stage,</p>
+<pre class="shell"><code>snow stage describe cli_stage  --schema=cli --database=foo</code></pre>
+<h3 id="list-stages">List Stages</h3>
+<p>List all available stages,</p>
+<pre class="shell"><code>snow stage list</code></pre>
+<p>List stages in specific to a database named <code>foo</code>,</p>
+<pre class="shell"><code>snow stage list --in database foo</code></pre>
+<p>List stages by name that starts with <code>cli</code> in database
+<code>foo</code>,</p>
+<pre class="shell"><code>snow stage list --like &#39;cli%&#39; --in database foo</code></pre>
+<h3 id="copy-files">Copy Files</h3>
+<p>Download <a href="https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/employees.csv">employees.csv</a>,</p>
+<pre class="shell"><code>curl -sSL -o employees.csv https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/employees.csv</code></pre>
+<p>Copy <code>employees.csv</code> to stage <code>cli_stage</code> to a
+path <code>/data</code>,</p>
+<pre class="shell"><code>snow stage copy employees.csv &#39;@cli_stage/data&#39;  --schema=cli --database=foo</code></pre>
+<h3 id="list-files-in-stage">List Files in Stage</h3>
+<p>List all files in stage <code>cli_stage</code> in schema
+<code>cli</code> of database <code>foo</code>,</p>
+<pre class="shell"><code>snow stage list-files cli_stage  --schema=cli --database=foo</code></pre>
+<p>List files by pattern,</p>
+<pre class="shell"><code>snow stage list-files cli_stage --pattern=&#39;.*[.]csv&#39; --schema=cli --database=foo</code></pre>
+<h3 id="execute-files-from-stage">Execute Files From Stage</h3>
+<p>Download the <a href="https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/load_employees.sql">load_employees.sql</a>,</p>
+<pre class="shell"><code>curl -sSL -o load_employees.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/load_employees.sql</code></pre>
+<p>Copy <code>load_employees.sql</code> to stage <code>cli_stage</code>
+at path <code>/sql</code>,</p>
+<pre class="shell"><code>snow stage copy load_employees.sql &#39;@cli_stage/sql&#39;  --schema=cli --database=foo</code></pre>
+<p>Execute the SQL<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> from stage,</p>
+<pre class="shell"><code>snow stage execute &#39;@cli_stage/sql/load_employees.sql&#39;  --schema=cli --database=foo</code></pre>
+<blockquote>
+<p>[!NOTE] Execute takes the glob pattern, allowing to specify the file
+pattern to execute. <code>@stage/*</code> or <code>@stage/*.sql</code>
+both executes only sql files</p>
+</blockquote>
+<p>Query all employees to make sure the load worked,</p>
+<pre class="shell"><code>snow sql --schema=cli --database=foo -q &#39;SELECT * FROM EMPLOYEES&#39;</code></pre>
+<p>Download <a href="https://github.com/Snowflake-Labs/sf-cheatsheets/blob/main/samples/variables.sql">variables.sql</a>,</p>
+<pre class="shell"><code>curl -sSL -o variables.sql https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/variables.sql</code></pre>
+<p>Copy the <code>variables.sql</code> to stage,</p>
+<pre class="shell"><code>snow stage copy  variables.sql &#39;@cli_stage/sql&#39; --schema=cli --database=foo</code></pre>
+<p>Execute files from stage with values for template
+variables(<code>{{.dept}}</code> in variables.sql),</p>
+<pre class="shell"><code>snow stage execute &#39;@cli_stage/sql/variables.sql&#39; --variable=&quot;dept=1&quot;  --schema=cli --database=foo</code></pre>
+<p>Executing <code>variables.sql</code> would have created a view named
+<code>EMPLOYEE_DEPT_VIEW</code>, list the view it to see the variables
+replaced,</p>
+<pre class="shell"><code>snow object list view --like &#39;emp%&#39; --database=foo --schema=cli</code></pre>
+<blockquote>
+<p>[!NOTE] SnowCLI allows processing templating using
+<code>{{...}}</code> and <code>&amp;{...}</code></p>
+<ul>
+<li><code>{{...}}</code> is a preferred templating i.g Jinja templating
+for server side processing</li>
+<li><code>&amp;{...}</code> is a preferred templating for client side
+processing</li>
+<li>All client side context variables can be accessed using
+<code>&amp;{ctx.env.&lt;var&gt;}</code>
+e.g. <code>&amp;{ctx.env.USER}</code> returns the current OS user</li>
+</ul>
+</blockquote>
+<h3 id="remove-files-from-stage">Remove File(s) from Stage</h3>
+<p>Remove all files from stage <code>cli_stage</code> on path
+<code>/data</code></p>
+<pre class="shell"><code>snow stage remove cli_stage &#39;data/&#39;  --schema=cli --database=foo</code></pre>
+<h2 id="native-apps">Native Apps</h2>
+<h3 id="create-app">Create App</h3>
+<p>Create a Snowflake Native App <code>my_first_app</code> in current
+working directory,</p>
+<pre class="shell"><code>snow app init my_first_app</code></pre>
+<p>Create a Snowflake Native App in directory
+<code>my_first_app</code></p>
+<pre class="shell"><code>snow app init --name &#39;my-first-app&#39; my_first_app</code></pre>
+<blockquote>
+<p>[!NOTE] Since the name becomes a part of the application URL its
+recommended to have URL safe names</p>
+</blockquote>
+<p>Create a Snowflake Native App with Streamlit Python template<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<pre class="shell"><code>snow app init my_first_app --template streamlit-python</code></pre>
+<blockquote>
+<p>[!NOTE] You can also create your Snowflake Native App template and
+use <code>--template-repo</code> instead, to scaffold your Native App
+using your template.</p>
+</blockquote>
+<h3 id="run-app">Run App</h3>
+<p>From the application directory i.e. <code>cd my_first_app</code></p>
+<pre class="shell"><code>snow app run</code></pre>
+<h3 id="version-app">Version App</h3>
+<blockquote>
+<p>![IMPORTANT] The version name should be valid SQL identifier i.e. no
+dots, no dashes and start with a character usually version labels use
+<code>v</code>.</p>
+</blockquote>
+<h4 id="create-version">Create Version</h4>
+<p>Create a development version named <code>dev</code>,</p>
+<pre class="shell"><code>snow app version create</code></pre>
+<p>Create a development version named <code>v1_0</code>,</p>
+<pre class="shell"><code>snow app version create v1_0</code></pre>
+<p>List available versions</p>
+<pre class="shell"><code>snow app version list</code></pre>
+<h4 id="drop-a-version">Drop a Version</h4>
+<pre class="shell"><code>snow app version drop v1_0</code></pre>
+<h4 id="deploy-a-version">Deploy a Version</h4>
+<p>Deploy a particular version of an application,</p>
+<pre class="shell"><code>snow app run --version=v1_0</code></pre>
+<p>Deploy a particular version and patch,</p>
+<pre class="shell"><code>snow app run --version=v1_0 --patch=1</code></pre>
+<blockquote>
+<p>[!NOTE] Version <code>patches</code> are automatically incremented
+when creating version with same name</p>
+</blockquote>
+<h2 id="open-app">Open App</h2>
+<p>Open the application on a browser,</p>
+<pre class="shell"><code>snow app open</code></pre>
+<h2 id="deploy">Deploy</h2>
+<p>Synchronize the local application file changes with stage and don’t
+create/update the running application,</p>
+<pre class="shell"><code>snow app deploy</code></pre>
+<h2 id="delete-app">Delete App</h2>
+<pre class="shell"><code>snow app teardown</code></pre>
+<p>If the application has version associated then drop the version,</p>
+<pre class="shell"><code>snow app version drop</code></pre>
+<p>And then drop the application</p>
+<pre class="shell"><code>snow app teardown</code></pre>
+<p>Drop application and its associated database objects,</p>
+<pre class="shell"><code>snow app teardown --cascade</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.snowflake.com/blog/devops-snowflake-accelerating-development-productivity/">Accelerate
+Development and Productivity with DevOps in Snowflake</a></li>
+</ul>
+<h3 id="quickstarts">Quickstarts</h3>
+<ul>
+<li><a href="https://quickstarts.snowflake.com/guide/getting-started-with-snowflake-cli/#0">Snowflake
+Developers::Quickstart</a></li>
+<li><a href="https://youtu.be/ooyZh56NePA?si=3yV3s2z9YwPWVJc-">Snowflake
+Developers::Getting Started With Snowflake CLI</a></li>
+<li><a href="https://quickstarts.snowflake.com/guide/build_rag_based_equipment_maintenance_app_using_snowflake_cortex/index.html?index=../..index#0">Build
+Rag Based Equipment Maintenance App Using Snowflake Cortex</a></li>
+<li><a href="https://quickstarts.snowflake.com/guide/asking_questions_to_your_own_documents_with_snowflake_cortex/index.html?index=../..index#1">Build
+a Retrieval Augmented Generation (RAG) based LLM assistant using
+Streamlit and Snowflake Cortex</a></li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index">Snowflake
+CLI</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/execute-immediate-from">Execute
+Immediate Jinja Templating</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/native-apps/native-apps-about">Snowpark
+Native App Framework</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions">Snowflake
+Cortex LLM Functions</a></li>
+</ul>
+<h3 id="tutorials">Tutorials</h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/native-apps/tutorials/getting-started-tutorial">Snowflake
+Native App Tutorial</a></li>
+</ul>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>https://docs.snowflake.com/developer-guide/snowflake-cli-v2/connecting/specify-credentials#how-to-use-environment-variables-for-snowflake-credentials<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#choosing-a-model<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>https://docs.snowflake.com/en/sql-reference/sql/execute-immediate<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>https://github.com/snowflakedb/native-apps-templates<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

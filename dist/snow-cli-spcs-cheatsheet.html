@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>snow-cli-spcs-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">snow-cli-spcs-cheatsheet</h1>
+</header>
+<h1 id="snowpark-container-servicesspcs">Snowpark Container
+Services(SPCS)</h1>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<ul>
+<li>SPCS is available only on certain AWS regions and not available for
+trial accounts</li>
+<li>All Snowpark Containers are run using a defined compute pool.</li>
+</ul>
+</blockquote>
+<h2 id="compute-pool">Compute Pool</h2>
+<p>List of available instance families<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<ul>
+<li>CPU_X64_XS</li>
+<li>CPU_X64_S</li>
+<li>CPU_X64_M</li>
+<li>CPU_X64_L</li>
+<li>HIGHMEM_X64_S</li>
+<li>HIGHMEM_X64_M</li>
+<li>HIGHMEM_X64_L</li>
+<li>GPU_NV_S</li>
+<li>GPU_NV_M</li>
+<li>GPU_NV_L</li>
+</ul>
+<h3 id="create">Create</h3>
+<p>Create a compute pool named <code>my_xs_compute_pool</code> with
+family <code>CPU_X64_XS</code>,</p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS</code></pre>
+<p>Create with <code>if not exists</code>,</p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --if-not-exists</code></pre>
+<p>Create with initially suspended (<strong>default</strong>: not
+suspended initially),</p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --init-suspend</code></pre>
+<p>Create with auto suspend(<strong>default</strong>:
+<code>3600 secs</code>) set to <code>2 mins(120 secs)</code> ,</p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --auto-suspend-secs=120</code></pre>
+<p>Create with minimum nodes(scale down) as
+<code>1</code>(<strong>default</strong>) and maximum nodes(scale up) as
+<code>3</code></p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --min-nodes=1 --max-nodes=3</code></pre>
+<p>Create with auto resume on service/job request,</p>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --auto-resume</code></pre>
+<p>Create with auto-resume disabled,</p>
+<blockquote>
+<p>[!NOTE] Auto Resume disabled requires the compute pool to be started
+manually.</p>
+</blockquote>
+<pre class="shell"><code>snow spcs compute-pool create my_xs_compute_pool \
+  --family CPU_X64_XS --no-auto-resume</code></pre>
+<h3 id="list-compute-pool">List Compute Pool</h3>
+<p>List all available compute pools for current role,</p>
+<pre class="shell"><code>snow spcs compute-pool list</code></pre>
+<p>List compute pools like <code>my_xs%</code></p>
+<pre class="shell"><code>snow spcs compute-pool list --like &#39;my_xs%&#39;</code></pre>
+<h3 id="describe-compute-pool">Describe Compute Pool</h3>
+<p>Get details about a compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool describe my_xs_compute_pool</code></pre>
+<h3 id="status-of-compute-pool">Status of Compute Pool</h3>
+<p>To know the current status of a compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool status my_xs_compute_pool</code></pre>
+<h3 id="suspend-a-compute-pool">Suspend a Compute Pool</h3>
+<p>Suspend a compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool suspend my_xs_compute_pool</code></pre>
+<h3 id="resume-a-compute-pool">Resume a Compute Pool</h3>
+<p>Resume a compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool resume my_xs_compute_pool</code></pre>
+<h3 id="properties-on-compute-pool">Properties on Compute Pool</h3>
+<p>You can <code>set/unset</code> the following properties on a compute
+pool after it’s created,</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--min-nodes</code></td>
+<td style="text-align: left;">Minimum Node(s)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max-nodes</code></td>
+<td style="text-align: left;">Maximum Nodes(s)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--auto-resume</code></td>
+<td style="text-align: left;">Enable Auto Resume</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--no-auto-resume</code></td>
+<td style="text-align: left;">Disable Auto Resume</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--auto-suspend-secs</code></td>
+<td style="text-align: left;">Auto Suspend in seconds</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--comment</code></td>
+<td style="text-align: left;">Comment</td>
+</tr>
+</tbody>
+</table>
+<h4 id="set">Set</h4>
+<p>Add a <code>comment</code> to the compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool set --comment &#39;my small compute pool&#39; my_xs_compute_pool</code></pre>
+<h4 id="unset">Unset</h4>
+<p>Remove the <code>comment</code> from compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool unset --comment my_xs_compute_pool</code></pre>
+<h3 id="delete-all-services-on-compute-pool">Delete all services on
+Compute Pool</h3>
+<p>Delete all services running on a compute pool</p>
+<pre class="shell"><code>snow spcs compute-pool stop-all my_xs_compute_pool</code></pre>
+<h3 id="drop-compute-pool">Drop Compute Pool</h3>
+<p>Drop the compute pool,</p>
+<pre class="shell"><code>snow spcs compute-pool drop my_xs_compute_pool</code></pre>
+<h2 id="image-registry">Image Registry</h2>
+<h3 id="login">Login</h3>
+<blockquote>
+<p>[!IMPORTANT] This requires Docker on local system</p>
+</blockquote>
+<pre class="shell"><code>snow spcs image-registry login</code></pre>
+<h3 id="token">Token</h3>
+<p>Get <code>current user</code> token to access image registry,</p>
+<pre class="shell"><code>snow spcs image-registry token</code></pre>
+<h3 id="registry-url">Registry URL</h3>
+<p>Get image registry URL,</p>
+<pre class="shell"><code>snow spcs image-registry url</code></pre>
+<h2 id="image-repository">Image Repository</h2>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<ul>
+<li>A Database and Schema is required to create the Image
+Repository</li>
+<li>Services can’t be created using <code>ACCOUNTADMIN</code>, a custom
+role is required</li>
+</ul>
+</blockquote>
+<p>The <a href="https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql">SQL
+script</a> defines role, grants and warehouse.</p>
+<p>As <code>ACCOUNTADMIN</code> run the script to setup required
+Snowflake resources,</p>
+<ul>
+<li>A Role named <code>cheatsheets_spcs_demo_role</code> to create
+Snowpark Container Services</li>
+<li>A Database named <code>CHEATSHEETS_DB</code> where the services will
+be attached to</li>
+<li>A Schema named <code>DATA_SCHEMA</code> on DB
+<code>CHEATSHEETS_DB</code> to hold the image repository.</li>
+<li>A Warehouse <code>cheatsheets_spcs_wh_s</code> which will be used to
+run query from services.</li>
+</ul>
+<p>Set your Snowflake account user name,</p>
+<pre class="shell"><code>export SNOWFLAKE_USER=&lt;your snowflake user&gt;</code></pre>
+<p>Run the <code>spcs_setup.sql</code> create the aforementioned
+Snowflake objects,</p>
+<pre class="shell"><code>curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql |
+snow sql --stdin</code></pre>
+<h3 id="create-1">Create</h3>
+<p>Create a image repository named <code>my_image_repository</code>,</p>
+<pre class="shell"><code>snow spcs image-repository create my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Create with if not exists,</p>
+<pre class="shell"><code>snow spcs image-repository create my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39; \
+  --if-not-exists</code></pre>
+<p>Replace image repository <code>my_image_repository</code>,</p>
+<pre class="shell"><code>snow spcs image-repository create my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39; \
+  --replace</code></pre>
+<h3 id="list-image-repositories">List Image Repositories</h3>
+<p>List all image repositories in the database and schema,</p>
+<pre class="shell"><code>snow spcs image-repository list \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="url">URL</h3>
+<p>Get URL of the image repository <code>my_image_repository</code>,</p>
+<pre class="shell"><code>snow spcs image-repository url my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="list-images">List Images</h3>
+<p>Let us push a sample image to repository,</p>
+<pre class="shell"><code>IMAGE_REPOSITORY=$(snow spcs image-repository url my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39;  \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;)
+docker pull --platform=linux/amd64 nginx
+docker tag nginx &quot;$IMAGE_REPOSITORY/nginx&quot;
+docker push &quot;$IMAGE_REPOSITORY/nginx&quot;</code></pre>
+<p>List all images in repository <code>my_image_repository</code>,</p>
+<pre class="shell"><code>snow spcs image-repository list-images my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="list-image-tags">List Image Tags</h3>
+<p>List all tags for image <code>nginx</code> in repository
+<code>my_image_repository</code>,</p>
+<blockquote>
+<p>[!IMPORTANT] The <code>--image-name</code> should be fully qualified
+name. Use <code>list-images</code> to get the fully qualified image
+name</p>
+</blockquote>
+<pre class="shell"><code>snow spcs image-repository list-tags my_image_repository \
+  --image-name=/CHEATSHEETS_DB/DATA_SCHEMA/my_image_repository/nginx \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="drop">Drop</h3>
+<pre class="shell"><code>snow spcs image-repository drop my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h2 id="services">Services</h2>
+<p>Create a SPCS service specification<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+file,</p>
+<blockquote>
+<p>[!TIP] Tools like <a href="https://jqlang.github.io/jq/">jq</a> can
+help extract data from the command output e.g. to get the image name</p>
+<pre class="shell"><code>export IMAGE=$(snow spcs image-repository list-images my_image_repository \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; --format json | jq -r &#39;.[0].image&#39;)</code></pre>
+</blockquote>
+<pre class="shell"><code>cat &lt;&lt;EOF | tee work/service-spec.yaml
+spec:
+  containers:
+    - name: nginx
+      image: $IMAGE
+      readinessProbe:
+        port: 80
+        path: /
+  endpoints:
+    - name: nginx
+      port: 80
+      public: true
+EOF</code></pre>
+<p>Create a Service named <code>nginx</code> using compute pool
+<code>my_xs_compute_pool</code> and specification
+<code>work/service-spec.yaml</code>,</p>
+<pre class="shell"><code>snow spcs service create nginx \
+  --compute-pool=my_xs_compute_pool \
+  --spec-path=work/service-spec.yaml \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Create a Service if not exists,</p>
+<pre class="shell"><code>snow spcs service create nginx \
+  --compute-pool=my_xs_compute_pool \
+  --spec-path=work/service-spec.yaml \
+  --if-not-exists \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Create with minimum instances <code>1</code>
+(<strong>default</strong>) and maximum instances to be
+<code>3</code>,</p>
+<pre class="shell"><code>snow spcs service create nginx \
+  --compute-pool=my_xs_compute_pool \
+  --spec-path=work/service-spec.yaml \
+  --min-instances=1 \
+  --max-instances=3 \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Create service that uses a specific warehouse
+<code>cheatsheets_spcs_wh_s</code> for all its queries,</p>
+<pre class="shell"><code>snow spcs service create nginx \
+  --compute-pool=my_xs_compute_pool \
+  --spec-path=work/service-spec.yaml \
+  --query-warehouse=&#39;cheatsheets_spcs_wh_s&#39; \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="status">Status</h3>
+<p>Check service status,</p>
+<blockquote>
+<p>[!NOTE] It will take few minutes for the service to be in
+<code>READY</code> status</p>
+</blockquote>
+<pre class="shell"><code>snow spcs service status nginx \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="describe">Describe</h3>
+<p>Get more details about the service,</p>
+<pre class="shell"><code>snow spcs service describe nginx \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="check-logs-of-service">Check Logs of Service</h3>
+<p>Check the logs of service with the container named <code>nginx</code>
+with instance <code>0</code>,</p>
+<blockquote>
+<p>[!NOTE] Find <code>instanceId</code> and <code>containerName</code>
+using the command <code>describe</code> command.</p>
+</blockquote>
+<pre class="shell"><code>snow spcs service logs nginx \
+  --container-name=nginx \
+  --instance-id=0 \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="list">List</h3>
+<p>List all available services,</p>
+<pre class="shell"><code>snow spcs service list  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Query services <code>in</code> database,</p>
+<pre class="shell"><code>snow spcs service list  --in database CHEATSHEETS_DB \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Query services <code>in</code> database and like
+<code>ng%</code>,</p>
+<pre class="shell"><code>snow spcs service list  --in database CHEATSHEETS_DB --like &#39;ng%&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="service-endpoints">Service Endpoints</h3>
+<p>List the service endpoint for the service <code>nginx</code>,</p>
+<pre class="shell"><code>snow spcs service list-endpoints nginx  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<blockquote>
+<p>[!NOTE] Open the <code>ingress_url</code> on the browser will take
+you to NGINX home page after authentication</p>
+</blockquote>
+<h3 id="suspend-a-service">Suspend a service</h3>
+<p>Suspend the service,</p>
+<pre class="shell"><code>snow spcs service suspend nginx  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="resume-a-service">Resume a service</h3>
+<p>Resume the service,</p>
+<pre class="shell"><code>snow spcs service resume nginx  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<blockquote>
+<p>[!NOTE] Resume service will take few minutes, use the
+<code>status</code> command to check the status</p>
+</blockquote>
+<h3 id="supported-properties-on-service">Supported properties on
+Service</h3>
+<p>You can <code>set/unset</code> the following properties on a service
+even after it’s created,</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 79%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Option</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--min-instances</code></td>
+<td style="text-align: left;">Minimum number of service instance(s),
+typically used while scaling down</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--max-instances</code></td>
+<td style="text-align: left;">Maximum number of service instance(s),
+typically used while scaling up</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--auto-resume</code></td>
+<td style="text-align: left;">Enable auto resume</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--no-auto-resume</code></td>
+<td style="text-align: left;">Disable auto resume</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--query-warehouse</code></td>
+<td style="text-align: left;">The Warehouse to use while doing query
+from the service</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--comment</code></td>
+<td style="text-align: left;">Comment for the service</td>
+</tr>
+</tbody>
+</table>
+<h4 id="set-1">Set</h4>
+<p>Add a comment to the service,</p>
+<pre class="shell"><code>snow spcs service set --comment &#39;the nginx service&#39; nginx  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<p>Use service <code>describe</code> to check on the updated
+property</p>
+<h4 id="unset-1">Unset</h4>
+<p>Remove the comment from the service,</p>
+<pre class="shell"><code>snow spcs service unset --comment nginx  \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="upgrade">Upgrade</h3>
+<p>Upgrade the service <code>nginx</code> with new specification e.g a
+tag upgrade or probe updates etc.,</p>
+<pre class="shell"><code>snow spcs service upgrade nginx \
+  --spec-path=work/service-spec_V2.yaml \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<h3 id="drop-1">Drop</h3>
+<p>Drop a service named <code>nginx</code></p>
+<pre class="shell"><code>snow spcs service drop nginx \
+  --database=&#39;CHEATSHEETS_DB&#39; \
+  --schema=&#39;DATA_SCHEMA&#39; \
+  --role=&#39;cheatsheets_spcs_demo_role&#39;</code></pre>
+<blockquote>
+<p>[!NOTE] SPCS has compute associated with it, run the <a href="https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql">clean
+up</a> script to clean the Snowflake resources created as part of this
+cheatsheet.</p>
+<pre class="shell"><code>curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql |
+snow sql --stdin</code></pre>
+</blockquote>
+<h3 id="quickstarts">Quickstarts</h3>
+<ul>
+<li><a href="https://quickstarts.snowflake.com/guide/getting-started-with-snowflake-cli/#0">Snowflake
+Developers::Quickstart</a></li>
+<li><a href="https://youtu.be/ooyZh56NePA?si=3yV3s2z9YwPWVJc-">Snowflake
+Developers::Getting Started With Snowflake CLI</a></li>
+<li><a href="https://quickstarts.snowflake.com/guide/intro_to_snowpark_container_services/index.html?index=../..index#0">Intro
+to Snowpark Container Services</a></li>
+<li><a href="https://quickstarts.snowflake.com/guide/build_a_data_app_and_run_it_on_Snowpark_container_services/index.html?index=../..index#0">Build
+a Data App and run it on Snowpark Container Services</a></li>
+</ul>
+<h3 id="documentation">Documentation</h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli-v2/index">Snowflake
+CLI</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/execute-immediate-from">Execute
+Immediate Jinja Templating</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview">Snowpark
+Container Services</a></li>
+</ul>
+<h3 id="tutorials">Tutorials</h3>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview-tutorials">Snowpark
+Container Services Tutorial</a></li>
+</ul>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>https://docs.snowflake.com/en/sql-reference/sql/create-compute-pool<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>https://docs.snowflake.com/en/developer-guide/snowpark-container-services/specification-reference<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+</body>
+</html>

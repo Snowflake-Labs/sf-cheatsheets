@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>iceberg-snowflake-managed-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">iceberg-snowflake-managed-cheatsheet</h1>
+</header>
+<h1 id="snowflake-iceberg-tables-with-s3-integration---complete-cheatsheet">Snowflake
+Iceberg Tables with S3 Integration - Complete Cheatsheet</h1>
+<h2 id="part-1-set-up-aws-resources">Part 1: Set Up AWS Resources</h2>
+<p>First, we’ll create the necessary AWS resources that Snowflake will
+use to store Iceberg table data.</p>
+<p>Let us set some environment variables for convinience and use:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set bucket name in environment variable</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">S3_BUCKET_NAME</span><span class="op">=</span><span class="st">&quot;kamesh-snowflake-iceberg-demo&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">AWS_ROLE_NAME</span><span class="op">=</span><span class="st">&quot;snowflake-iceberg-role&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">AWS_REGION</span><span class="op">=</span><span class="st">&quot;us-west-2&quot;</span></span></code></pre></div>
+<blockquote>
+<p>NOTE: If <code>S3_BUCKET_NAME</code> already exist try using a
+different name</p>
+</blockquote>
+<h3 id="s3-bucket-creation">1. S3 Bucket Creation</h3>
+<p>Create an S3 bucket in the same region
+<code>us-west-2($AWS_REGION)</code> as your Snowflake warehouse:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api create-bucket <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--region</span> <span class="va">$AWS_REGION</span> <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--create-bucket-configuration</span> LocationConstraint=<span class="va">$AWS_REGION</span></span></code></pre></div>
+<p>Enable versioning (recommended for data consistency)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api put-bucket-versioning <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--versioning-configuration</span> Status=Enabled</span></code></pre></div>
+<h3 id="iam-role-creation">2. IAM Role Creation</h3>
+<p>Create an IAM role that Snowflake will assume to access the S3
+bucket:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create IAM role with basic trust policy</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam create-role <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--assume-role-policy-document</span> <span class="st">&#39;{&quot;Version&quot;:&quot;2012-10-17&quot;,&quot;Statement&quot;:[{&quot;Effect&quot;:&quot;Allow&quot;,&quot;Principal&quot;:{&quot;Service&quot;:&quot;s3.amazonaws.com&quot;},&quot;Action&quot;:&quot;sts:AssumeRole&quot;}]}&#39;</span></span></code></pre></div>
+<p>Store the role ARN for later use</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ROLE_ARN</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> iam get-role <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="at">--query</span> <span class="st">&#39;Role.Arn&#39;</span> <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Role ARN: </span><span class="va">$ROLE_ARN</span><span class="st">&quot;</span></span></code></pre></div>
+<h3 id="s3-access-policy-creation">3. S3 Access Policy Creation</h3>
+<p>Create and attach an IAM policy that grants the required S3
+permissions:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the policy definition file (iceberg-s3-policy.json)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> iceberg-s3-policy.json <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;Version&quot;: &quot;2012-10-17&quot;,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;Statement&quot;: [</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Effect&quot;: &quot;Allow&quot;,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Action&quot;: [</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:PutObject&quot;,</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:GetObject&quot;,</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:GetObjectVersion&quot;,</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:DeleteObject&quot;,</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:DeleteObjectVersion&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="st">            ],</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Resource&quot;: &quot;arn:aws:s3:::</span><span class="va">${S3_BUCKET_NAME}</span><span class="st">/*&quot;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="st">        },</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="st">        {</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Effect&quot;: &quot;Allow&quot;,</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Action&quot;: [</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:ListBucket&quot;,</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;s3:GetBucketLocation&quot;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="st">            ],</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Resource&quot;: &quot;arn:aws:s3:::</span><span class="va">${S3_BUCKET_NAME}</span><span class="st">&quot;,</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="st">            &quot;Condition&quot;: {</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="st">                &quot;StringLike&quot;: {</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="st">                    &quot;s3:prefix&quot;: [</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="st">                        &quot;*&quot;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="st">                    ]</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="st">                }</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="st">            }</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="st">    ]</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h4 id="create-iam-policy">Create IAM policy</h4>
+<pre class="shell"><code>aws iam create-policy \
+    --policy-name snowflake-iceberg-policy \
+    --policy-document file://iceberg-s3-policy.json</code></pre>
+<h4 id="attach-policy-to-role">Attach policy to role</h4>
+<pre class="shell"><code>aws iam attach-role-policy \
+    --role-name $AWS_ROLE_NAME \
+    --policy-arn arn:aws:iam::$(aws sts get-caller-identity --query &#39;Account&#39; --output text):policy/snowflake-iceberg-policy</code></pre>
+<h2 id="part-3-update-aws-trust-relationship">Part 3: Update AWS Trust
+Relationship</h2>
+<p>After creating the external volume in Snowflake, you need to update
+the AWS IAM role with the trust relationship using values generated by
+Snowflake.</p>
+<h3 id="extract-snowflake-integration-values">1. Extract Snowflake
+Integration Values</h3>
+<p>Once you have created the external volume in Snowflake, extract the
+necessary values:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_IAM_USER_ARN</span><span class="op">=</span><span class="va">$(</span><span class="ex">snow</span> sql <span class="at">--query</span> <span class="st">&quot;DESC EXTERNAL VOLUME ICEBERG_DEMO_VOLUME&quot;</span> <span class="at">--format</span> json <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.[1].property_value|fromjson.STORAGE_AWS_IAM_USER_ARN&#39;</span><span class="va">)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;IAM User ARN: </span><span class="va">$SNOWFLAKE_IAM_USER_ARN</span><span class="st">&quot;</span></span></code></pre></div>
+<p>Get the External ID (automatically generated by Snowflake) and set as
+environment variable</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_EXTERNAL_ID</span><span class="op">=</span><span class="va">$(</span><span class="ex">snow</span> sql <span class="at">--query</span> <span class="st">&quot;DESC EXTERNAL VOLUME ICEBERG_DEMO_VOLUME&quot;</span> <span class="at">--format</span> json <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.[1].property_value|fromjson.STORAGE_AWS_EXTERNAL_ID&#39;</span><span class="va">)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;External ID: </span><span class="va">$SNOWFLAKE_EXTERNAL_ID</span><span class="st">&quot;</span></span></code></pre></div>
+<h3 id="update-iam-role-trust-relationship">2. Update IAM Role Trust
+Relationship</h3>
+<p>View the current trust policy:</p>
+<pre class="shell"><code>echo &quot;Current trust policy before update:&quot;
+aws iam get-role --role-name $AWS_ROLE_NAME --query &#39;Role.AssumeRolePolicyDocument&#39; --output json</code></pre>
+<p>Update and apply the trust policy:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> snowflake-trust-policy.json <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">  &quot;Version&quot;: &quot;2012-10-17&quot;,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">  &quot;Statement&quot;: [</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;Effect&quot;: &quot;Allow&quot;,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;Principal&quot;: {</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">        &quot;AWS&quot;: &quot;</span><span class="va">${SNOWFLAKE_IAM_USER_ARN}</span><span class="st">&quot;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">      },</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;Action&quot;: &quot;sts:AssumeRole&quot;,</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="st">      &quot;Condition&quot;: {</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="st">        &quot;StringEquals&quot;: {</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">          &quot;sts:ExternalId&quot;: &quot;</span><span class="va">${SNOWFLAKE_EXTERNAL_ID}</span><span class="st">&quot;</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="st">      }</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<p>Update trust relationship on the role:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam update-assume-role-policy <span class="dt">\</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="dt">\</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">--policy-document</span> file://snowflake-trust-policy.json</span></code></pre></div>
+<blockquote>
+<p>NOTE: Give it few seconds for the trust policy to refresh in AWS.</p>
+</blockquote>
+<p>Run the following command to view the updated Trust policy. It should
+have the <code>$SNOWFLAKE_IAM_USER_ARN</code> and
+<code>$SNOWFLAKE_EXTERNAL_ID</code> updated in the policy:</p>
+<pre class="shell"><code>echo &quot;Updated trust policy:&quot;
+aws iam get-role --role-name $AWS_ROLE_NAME --query &#39;Role.AssumeRolePolicyDocument&#39; --output json</code></pre>
+<h2 id="part-3-set-up-snowflake-objects">Part 3: Set Up Snowflake
+Objects</h2>
+<p>Now that we have the AWS resources ready, we can configure Snowflake
+to use them using the <code>snow sql --stdin</code> approach.</p>
+<pre class="shell"><code>export SNOWLFLAKE_DEAULT_CONNECTION_NAME=&quot;&lt;your connection name e.g. trial&gt;&quot;</code></pre>
+<h3 id="setting-up-snowflake-database-and-schema">1. Setting Up
+Snowflake Database and Schema</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create initial Snowflake database and schema</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">CREATE DATABASE IF NOT EXISTS ICEBERG_DEMO_DB;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="st">CREATE SCHEMA IF NOT EXISTS ICEBERG_SCHEMA;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h3 id="setting-up-external-volume-with-s3">2. Setting Up External
+Volume with S3</h3>
+<p>Create the external volume using the AWS resources:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create external volume in Snowflake</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">CREATE OR REPLACE EXTERNAL VOLUME ICEBERG_DEMO_VOLUME</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">  STORAGE_LOCATIONS =</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="st">      (</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="st">        (</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="st">            NAME = &#39;iceberg-demo-location&#39;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="st">            STORAGE_PROVIDER = &#39;S3&#39;</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="st">            STORAGE_BASE_URL = &#39;s3://</span><span class="va">$S3_BUCKET_NAME</span><span class="st">/&#39;</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="st">            STORAGE_AWS_ROLE_ARN = &#39;</span><span class="va">$ROLE_ARN</span><span class="st">&#39;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="st">        )</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="st">      )</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="st">  ALLOW_WRITES = TRUE;</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h3 id="creating-iceberg-table">3. Creating Iceberg Table</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Iceberg table</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">CREATE ICEBERG TABLE IF NOT EXISTS TODO_ITEMS (</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st"> id VARCHAR,</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="st"> task VARCHAR,</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="st"> status VARCHAR,</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="st"> created_at TIMESTAMP_NTZ,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="st"> updated_at TIMESTAMP_NTZ</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="st">)</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="st">  CATALOG = &#39;SNOWFLAKE&#39;</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="st">  EXTERNAL_VOLUME = &#39;ICEBERG_DEMO_VOLUME&#39;</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="st">  BASE_LOCATION = &#39;todo_app_data&#39;;</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<p>Enable schema evolution to allow future field additions</p>
+<pre class="shell"><code>snow sql --stdin &lt;&lt; EOF
+USE ROLE ACCOUNTADMIN;
+USE DATABASE ICEBERG_DEMO_DB;
+USE SCHEMA ICEBERG_SCHEMA;
+ALTER ICEBERG TABLE TODO_ITEMS set ENABLE_SCHEMA_EVOLUTION = true;
+EOF</code></pre>
+<h3 id="verify-s3-integration">4. Verify S3 Integration</h3>
+<p>Insert a sample record into your Iceberg table and verify that the
+data and metadata are properly stored in the S3 bucket:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Insert a test record</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="st">INSERT INTO TODO_ITEMS (id, task, status, created_at, updated_at)</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="st">VALUES (&#39;test&#39;, &#39;Integration test&#39;, &#39;PENDING&#39;, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<p>Check for files in the S3 bucket</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3 ls s3://<span class="va">$S3_BUCKET_NAME</span>/ <span class="at">--recursive</span></span></code></pre></div>
+<p>The S3 bucket structure should look similar to:</p>
+<pre><code>2025-04-01 12:23:26       1024 todo_app_data.a43VCEFf/data/32/snow_V8coiQtGf2o_APg1YUMfMhg_0_1_002.parquet
+2025-04-01 12:23:11       1223 todo_app_data.a43VCEFf/metadata/00000-************************************.metadata.json
+2025-04-01 12:23:28       1954 todo_app_data.a43VCEFf/metadata/00001-************************************.metadata.json
+2025-04-01 12:23:28       6909 todo_app_data.a43VCEFf/metadata/1743490405955000000-9pkvny8A5NECsUIiJwmK1A.avro
+2025-04-01 12:23:28       4224 todo_app_data.a43VCEFf/metadata/snap-1743490405955000000-************************************.avro</code></pre>
+<h2 id="part-4-using-iceberg-tables">Part 4: Using Iceberg Tables</h2>
+<p>Now that the integration is set up, you can start using your Iceberg
+tables.</p>
+<h3 id="query-and-manipulate-data">Query and Manipulate Data</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Data manipulation examples</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="st">-- Insert todo items</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="st">INSERT INTO TODO_ITEMS (id, task, status, created_at, updated_at)</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="st">VALUES </span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="st">  (&#39;1&#39;, &#39;Complete Iceberg integration&#39;, &#39;PENDING&#39;, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()),</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="st">  (&#39;2&#39;, &#39;Test time travel functionality&#39;, &#39;PENDING&#39;, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()),</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="st">  (&#39;3&#39;, &#39;Document schema evolution&#39;, &#39;IN_PROGRESS&#39;, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="st">-- Query all todo items</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT * FROM TODO_ITEMS;</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="st">-- Query only pending tasks</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT * FROM TODO_ITEMS WHERE status = &#39;PENDING&#39;;</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="st">-- Update task status</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="st">UPDATE TODO_ITEMS </span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="st">SET status = &#39;COMPLETED&#39;, updated_at = CURRENT_TIMESTAMP() </span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE id = &#39;1&#39;;</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="st">-- Delete completed tasks</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="st">DELETE FROM TODO_ITEMS WHERE status = &#39;COMPLETED&#39;;</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h3 id="schema-evolution">Schema Evolution</h3>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Schema evolution examples</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="st">USE DATABASE ICEBERG_DEMO_DB;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="st">USE SCHEMA ICEBERG_SCHEMA;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="st">-- Add priority column to todo items</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS ADD COLUMN RECORD_METADATA OBJECT();</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="st">-- Add priority column to todo items</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS ADD COLUMN priority VARCHAR;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="st">-- Add due_date column</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS ADD COLUMN due_date DATE;</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="st">-- Rename status column to task_status for clarity</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS RENAME COLUMN status TO task_status;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="st">-- Drop unused column if needed</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS DROP COLUMN RECORD_METADATA;</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="st">-- Change task column to allow longer descriptions</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="st">ALTER ICEBERG TABLE TODO_ITEMS ALTER COLUMN task SET DATA TYPE VARCHAR(500);</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h2 id="cleanup-resources">Cleanup Resources</h2>
+<p>When you’re done with your testing or if you need to remove the
+resources, you can use the following commands to clean up.</p>
+<h3 id="cleaning-up-snowflake-resources">1. Cleaning Up Snowflake
+Resources</h3>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--stdin</span> <span class="op">&lt;&lt; EOF</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">USE ROLE ACCOUNTADMIN;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">-- Drop the Iceberg table first</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">DROP ICEBERG TABLE IF EXISTS ICEBERG_DEMO_DB.ICEBERG_SCHEMA.TODO_ITEMS;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="st">-- Drop the external volume</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="st">DROP EXTERNAL VOLUME IF EXISTS ICEBERG_DEMO_DB.ICEBERG_SCHEMA.ICEBERG_DEMO_VOLUME;</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="st">-- Drop the schema and database</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="st">DROP SCHEMA IF EXISTS ICEBERG_DEMO_DB.ICEBERG_SCHEMA;</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="st">DROP DATABASE IF EXISTS ICEBERG_DEMO_DB;</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h3 id="cleaning-up-aws-resources">2. Cleaning Up AWS Resources</h3>
+<p>First, remove all objects and their versions</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api list-object-versions <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="at">--output</span> json <span class="at">--query</span> <span class="st">&#39;{Objects: Versions[].{Key:Key,VersionId:VersionId}}&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">&#39;if .Objects != null then {Objects: .Objects} else {} end&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api delete-objects <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="at">--delete</span> file:///dev/stdin</span></code></pre></div>
+<p>Then delete all delete markers</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api list-object-versions <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="at">--output</span> json <span class="at">--query</span> <span class="st">&#39;{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jq</span> <span class="st">&#39;if .Objects != null then {Objects: .Objects} else {} end&#39;</span> <span class="kw">|</span> <span class="dt">\</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3api delete-objects <span class="at">--bucket</span> <span class="va">$S3_BUCKET_NAME</span> <span class="at">--delete</span> file:///dev/stdin</span></code></pre></div>
+<p>Finally delete the bucket</p>
+<pre><code>aws s3api delete-bucket --bucket $S3_BUCKET_NAME</code></pre>
+<p>Detach policy from role</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="va">POLICY_ARN</span><span class="op">=</span><span class="va">$(</span><span class="ex">aws</span> iam list-attached-role-policies <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="at">--query</span> <span class="st">&quot;AttachedPolicies[?PolicyName==&#39;snowflake-iceberg-policy&#39;].PolicyArn&quot;</span> <span class="at">--output</span> text<span class="va">)</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam detach-role-policy <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="at">--policy-arn</span> <span class="va">$POLICY_ARN</span></span></code></pre></div>
+<p>Delete the IAM role</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam delete-role <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span></span></code></pre></div>
+<p>Delete the policy</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam delete-policy <span class="at">--policy-arn</span> <span class="va">$POLICY_ARN</span></span></code></pre></div>
+<p>Remove local files created during setup</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> iceberg-s3-policy.json snowflake-trust-policy.json</span></code></pre></div>
+<h3 id="verification">3. Verification</h3>
+<p>Verify S3 bucket is deleted</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If no output, the bucket has been deleted</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> s3 ls <span class="kw">|</span> <span class="fu">grep</span> <span class="va">$S3_BUCKET_NAME</span></span></code></pre></div>
+<p>Verify IAM role is deleted</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Should return an error indicating the role doesn&#39;t exist</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">aws</span> iam get-role <span class="at">--role-name</span> <span class="va">$AWS_ROLE_NAME</span> <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;NoSuchEntity&quot;</span></span></code></pre></div>
+<p>Verify Snowflake resources are gone</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Should return no results</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--query</span> <span class="st">&quot;SHOW DATABASES LIKE &#39;ICEBERG_DEMO_DB&#39;&quot;</span> </span></code></pre></div>
+</body>
+</html>

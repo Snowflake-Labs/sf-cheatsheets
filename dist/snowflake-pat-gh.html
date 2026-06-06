@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>snowflake-pat-gh</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">snowflake-pat-gh</h1>
+</header>
+<h1 id="snowflake-pat-cheatsheet">Snowflake PAT Cheatsheet</h1>
+<p>This cheatsheet provides step-by-step instructions for managing
+Programmatic Access Tokens (PAT) in Snowflake. Learn how to set up PATs,
+configure policies, and integrate with GitHub Actions for secure
+automation and API access.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#quick-start">Quick Start</a>
+<ul>
+<li><a href="#1-environment-setup">1. Environment Setup</a></li>
+<li><a href="#2-verify-connection">2. Verify Connection</a></li>
+<li><a href="#3-create-required-objects">3. Create Required
+Objects</a></li>
+<li><a href="#4-configure-network-access">4. Configure Network
+Access</a></li>
+<li><a href="#5-generate-and-test-pat">5. Generate and Test PAT</a></li>
+<li><a href="#6-github-actions-integration">6. GitHub Actions
+Integration</a></li>
+</ul></li>
+<li><a href="#cleanup">Cleanup</a>
+<ul>
+<li><a href="#1-remove-pat">1. Remove PAT</a></li>
+<li><a href="#2-remove-network-configuration">2. Remove Network
+Configuration</a></li>
+<li><a href="#3-remove-github-secrets">3. Remove GitHub Secrets</a></li>
+</ul></li>
+<li><a href="#security-best-practices">Security Best Practices</a>
+<ul>
+<li><a href="#authentication">Authentication</a></li>
+<li><a href="#network-security">Network Security</a></li>
+<li><a href="#credential-management">Credential Management</a></li>
+</ul></li>
+<li><a href="#reference-links">Reference Links</a></li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before you begin, ensure you have: - <a href="https://signup.snowflake.com/">Snowflake account</a> with
+appropriate permissions - <a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/index">Snowflake
+CLI</a> installed and configured - <a href="https://cli.github.com/">GitHub CLI</a> installed and configured -
+<a href="https://stedolan.github.io/jq/">jq</a> installed for JSON
+parsing</p>
+<blockquote>
+<p>[!IMPORTANT]<br />
+Verify your Snowflake CLI connection before proceeding. See the <a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/connecting/connect">Snowflake
+CLI connection guide</a> if needed.</p>
+</blockquote>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="environment-setup">1. Environment Setup</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set required environment variables</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_USER</span><span class="op">=</span><span class="st">&quot;your Snowflake username&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_DEFAULT_CONNECTION_NAME</span><span class="op">=</span><span class="st">&quot;your Snowflake connection name from ~/.snowflake/config.toml&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MY_PAT_DEMO_ROLE</span><span class="op">=</span><span class="st">&quot;the role you want to restrict the PAT&quot;</span></span></code></pre></div>
+<p>Example configuration:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_USER</span><span class="op">=</span><span class="st">&quot;demo&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_DEFAULT_CONNECTION_NAME</span><span class="op">=</span><span class="st">&quot;trial&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">MY_PAT_DEMO_ROLE</span><span class="op">=</span><span class="st">&quot;public&quot;</span></span></code></pre></div>
+<h3 id="verify-connection">2. Verify Connection</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> connection test <span class="at">--format</span><span class="op">=</span>json</span></code></pre></div>
+<h3 id="create-required-objects">3. Create Required Objects</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Create database and schemas</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">DATABASE</span> my_demo_db;</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">SCHEMA</span> my_demo_db.policies;</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">SCHEMA</span> my_demo_db.networks;</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- Create authentication policy</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> AUTHENTICATION POLICY my_demo_db.policies.demos_auth_policy</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  AUTHENTICATION_METHODS <span class="op">=</span> (<span class="st">&#39;PASSWORD&#39;</span>, <span class="st">&#39;OAUTH&#39;</span>, <span class="st">&#39;KEYPAIR&#39;</span>, <span class="st">&#39;PROGRAMMATIC_ACCESS_TOKEN&#39;</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  PAT_POLICY <span class="op">=</span> (</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    DEFAULT_EXPIRY_IN_DAYS<span class="op">=</span><span class="dv">7</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    MAX_EXPIRY_IN_DAYS<span class="op">=</span><span class="dv">90</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    NETWORK_POLICY_EVALUATION <span class="op">=</span> ENFORCED_NOT_REQUIRED</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  );</span></code></pre></div>
+<h3 id="configure-network-access">4. Configure Network Access</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get GitHub Actions IP ranges (IPv4 only)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="va">GH_CIDRS</span><span class="op">=</span><span class="va">$(</span><span class="ex">curl</span> <span class="at">-s</span> https://api.github.com/meta <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.actions | map(select(contains(&quot;:&quot;) | not)) | map(&quot;&#39;</span><span class="dt">\&#39;</span><span class="st">&#39;&quot; + . + &quot;&#39;</span><span class="dt">\&#39;</span><span class="st">&#39;&quot;) | join(&quot;,&quot;)&#39;</span><span class="va">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get local IP</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">LOCAL_IP</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$(</span><span class="ex">dig</span> +short myip.opendns.com @resolver1.opendns.com<span class="va">)</span><span class="st">/32&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create variables for SQL</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">CIDR_VALUE_LIST</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$GH_CIDRS</span><span class="st">,</span><span class="va">$LOCAL_IP</span><span class="st">&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Create network rule</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">NETWORK</span> <span class="kw">RULE</span> my_demo_db.networks.pat_gh_actions_local_access_rule</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">MODE</span> <span class="op">=</span> INGRESS</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">TYPE</span> <span class="op">=</span> IPV4</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  VALUE_LIST <span class="op">=</span> ($CIDR_VALUE_LIST)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">COMMENT</span> <span class="op">=</span> <span class="st">&#39;Allow only GitHub and local machine IPv4 addresses&#39;</span>;</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- Create network policy</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">NETWORK</span> POLICY ALLOW_ALL_PAT_NETWORK_POLICY</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  ALLOWED_NETWORK_RULE_LIST <span class="op">=</span> (<span class="st">&#39;my_demo_db.networks.pat_gh_actions_local_access_rule&#39;</span>);</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- Apply network policy to user</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> $SNOWFLAKE_USER <span class="kw">SET</span> NETWORK_POLICY<span class="op">=</span><span class="st">&#39;ALLOW_ALL_PAT_NETWORK_POLICY&#39;</span>;</span></code></pre></div>
+<h3 id="generate-and-test-pat">5. Generate and Test PAT</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate PAT</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_PASSWORD</span><span class="op">=</span><span class="va">$(</span><span class="ex">snow</span> sql <span class="at">--query</span> <span class="st">&quot;ALTER USER IF EXISTS </span><span class="va">$SNOWFLAKE_USER</span><span class="st"> ADD PAT my_demo_pat ROLE_RESTRICTION = </span><span class="va">$MY_PAT_DEMO_ROLE</span><span class="st">&quot;</span> <span class="at">--format</span><span class="op">=</span>json <span class="kw">|</span> <span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.[] | .token_secret&#39;</span><span class="va">)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get connection details</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> connection test <span class="at">--format</span><span class="op">=</span>json <span class="op">&gt;</span> connection.json</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_ACCOUNT</span><span class="op">=</span><span class="va">$(</span><span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.Account&#39;</span> connection.json<span class="va">)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">SNOWFLAKE_HOST</span><span class="op">=</span><span class="va">$(</span><span class="ex">jq</span> <span class="at">-r</span> <span class="st">&#39;.Host&#39;</span> connection.json<span class="va">)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Test PAT connection</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--temporary-connection</span> <span class="dt">\</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">--account</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${SNOWFLAKE_ACCOUNT}</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--host</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${SNOWFLAKE_HOST}</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">--user</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${SNOWFLAKE_USER}</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">--query</span> <span class="st">&quot;select current_user(), current_role()&quot;</span></span></code></pre></div>
+<h3 id="github-actions-integration">6. GitHub Actions Integration</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set GitHub Secrets</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret set SNOWFLAKE_PASSWORD <span class="at">--body</span> <span class="st">&quot;</span><span class="va">$SNOWFLAKE_PASSWORD</span><span class="st">&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret set SNOWFLAKE_ACCOUNT <span class="at">--body</span> <span class="st">&quot;</span><span class="va">$SNOWFLAKE_ACCOUNT</span><span class="st">&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret set SNOWFLAKE_USER <span class="at">--body</span> <span class="st">&quot;</span><span class="va">$SNOWFLAKE_USER</span><span class="st">&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret set SNOWFLAKE_HOST <span class="at">--body</span> <span class="st">&quot;</span><span class="va">$SNOWFLAKE_HOST</span><span class="st">&quot;</span></span></code></pre></div>
+<h2 id="cleanup">Cleanup</h2>
+<h3 id="remove-pat">1. Remove PAT</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">snow</span> sql <span class="at">--query</span> <span class="st">&quot;ALTER USER IF EXISTS </span><span class="va">$SNOWFLAKE_USER</span><span class="st"> REMOVE PAT my_demo_pat&quot;</span></span></code></pre></div>
+<h3 id="remove-network-configuration">2. Remove Network
+Configuration</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Remove network policy from user</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> $SNOWFLAKE_USER UNSET NETWORK_POLICY;</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Drop network rule and policy</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">NETWORK</span> <span class="kw">RULE</span> my_demo_db.networks.pat_gh_actions_local_access_rule;</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">NETWORK</span> POLICY ALLOW_ALL_PAT_NETWORK_POLICY;</span></code></pre></div>
+<h3 id="remove-github-secrets">3. Remove GitHub Secrets</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret delete SNOWFLAKE_PASSWORD</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret delete SNOWFLAKE_ACCOUNT</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret delete SNOWFLAKE_USER</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> secret delete SNOWFLAKE_HOST</span></code></pre></div>
+<h2 id="security-best-practices">Security Best Practices</h2>
+<h3 id="authentication">Authentication</h3>
+<ul>
+<li>Use role restrictions with PATs to limit scope</li>
+<li>Set appropriate expiration periods (recommended: 7-30 days)</li>
+<li>Rotate PATs regularly and before expiration</li>
+</ul>
+<h3 id="network-security">Network Security</h3>
+<ul>
+<li>Always use HTTPS for API calls</li>
+<li>Restrict network access to specific IP ranges in production</li>
+<li>Regularly audit and update allowed IP ranges</li>
+</ul>
+<h3 id="credential-management">Credential Management</h3>
+<ul>
+<li>Store PATs securely using secret managers</li>
+<li>Never commit PATs to version control</li>
+<li>Use separate PATs for different applications/services</li>
+</ul>
+<h2 id="reference-links">Reference Links</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/programmatic-access-tokens">Snowflake
+PAT Documentation</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/create-authentication-policy">Snowflake
+Authentication Policies</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/create-network-policy">Snowflake
+Network Policies</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/create-network-rule">Snowflake
+Network Rules</a></li>
+<li><a href="https://docs.github.com/en/actions">GitHub Actions</a></li>
+<li><a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-githubs-ip-addresses">About
+GitHub’s IP addresses</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/index">Snowflake
+CLI Documentation</a></li>
+<li><a href="https://github.com/kameshsampath/snowflake-pat-demo">Snowflake PAT
+Demo</a></li>
+</ul>
+</body>
+</html>

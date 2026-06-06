@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>warehouses</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">warehouses</h1>
+</header>
+<h1 id="warehouses">Warehouses</h1>
+<p>Warehouses are the compute horses that does the processing of
+queries, running Machine Learning algorithms etc.,</p>
+<h2 id="valid-sizes">Valid Sizes</h2>
+<ul>
+<li>X-Small</li>
+<li>Small</li>
+<li>Medium</li>
+<li>Large</li>
+<li>X-Large</li>
+<li>2X-Large</li>
+<li>3X-Large</li>
+<li>4X-Large</li>
+<li>5X-Large</li>
+<li>6X-Large</li>
+</ul>
+<p>Check <a href="https://docs.snowflake.com/en/user-guide/warehouses-overview">overview</a>
+for details on size and its associated credits.</p>
+<h2 id="create-warehouse">Create Warehouse</h2>
+<p>Create warehouse requires only one parameter the
+<strong>NAME</strong> of the warehouse. e.g. <code>CREATE WAREHOUSE
+<mark>MY_FIRST_WH</mark></code></p>
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 68%" />
+<col style="width: 9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Property</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">WAREHOUSE_SIZE</td>
+<td style="text-align: left;">The warehouse compute size.</td>
+<td style="text-align: center;">X-small</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WAREHOUSE_TYPE</td>
+<td style="text-align: left;">The type of warehouse,
+<code>STANDARD</code> or <code>SNOWPARK-OPTIMIZED</code>.</td>
+<td style="text-align: center;">STANDARD</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MIN_CLUSTER_COUNT</td>
+<td style="text-align: left;">Minimum number of servers to scale down
+to.</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MIN_CLUSTER_COUNT</td>
+<td style="text-align: left;">Maximum number of servers to scale out
+to.</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">MAX_CLUSTER_COUNT</td>
+<td style="text-align: left;">Minimum number of servers to scale down
+to.</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">AUTO_SUSPEND</td>
+<td style="text-align: left;">Idle number of <strong>seconds</strong>
+before suspending the warehouse.</td>
+<td style="text-align: center;">300</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AUTO_RESUME</td>
+<td style="text-align: left;">On-demand start of the warehouse .</td>
+<td style="text-align: center;">TRUE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INITIALLY_SUSPENDED</td>
+<td style="text-align: left;">Start warehouse automatically after
+successful creation.</td>
+<td style="text-align: center;">TRUE</td>
+</tr>
+</tbody>
+</table>
+<p>Check the <a href="https://docs.snowflake.com/en/sql-reference/sql/create-warehouse">docs</a>
+for more details on the parameters and other available options.</p>
+<p>Create a Warehouse named <code>MY_FIRST_WH</code> with defaults:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE MY_FIRST_WH</span></code></pre></div>
+<h2 id="create-warehouse-my_small_wh">CREATE WAREHOUSE MY_SMALL_WH</h2>
+<p>Create Warehouse named <code>MY_SMALL_WH</code> with size as
+<code>Small</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE MY_SMALL_WH</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;Small&#39;</span></span></code></pre></div>
+<p>Create Warehouse named <code>MY_SMALL_STARTED_WH</code> with size as
+<code>Small</code> and start it automatically after create:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE MY_SMALL_STARTED_WH</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;Small&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>INITIALLY_SUSPENDED <span class="op">=</span> <span class="kw">FALSE</span></span></code></pre></div>
+<p>Create Warehouse named <code>MY_LONG_RUNNING_WH</code> with size as
+<code>Small</code> and make to automatically suspend after
+<code>10 mins(600 seconds)</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE MY_LONG_RUNNING_WH</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;Small&#39;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>AUTO_SUSPEND <span class="op">=</span> <span class="dv">600</span></span></code></pre></div>
+<blockquote>
+<p>[!TIP]</p>
+<ul>
+<li>Use bigger Warehouse size for <em>CPU</em> or <em>Memory</em>
+intensive operations.</li>
+<li>Adjust <em>MIN_CLUSTER_COUNT</em> and <em>MAX_CLUSTER_COUNT</em> to
+increase concurrency i.e. process more queries in parallel</li>
+</ul>
+</blockquote>
+<h2 id="check-warehouse-properties">Check Warehouse Properties</h2>
+<p>Check a particular warehouse properties</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES <span class="kw">LIKE</span> <span class="st">&#39;MY_SMALL_WH&#39;</span>;</span></code></pre></div>
+<h2 id="list-all-warehouses">List All Warehouses</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES</span></code></pre></div>
+<h2 id="working-with-warehouse">Working With Warehouse</h2>
+<p>Use a particular warehouse</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> WAREHOUSE MY_SMALL_WH</span></code></pre></div>
+<p>Manually start a warehouse,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE MY_SMALL_WH <span class="kw">RESUME</span></span></code></pre></div>
+<p>Manually suspend a warehouse,</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE MY_SMALL_WH <span class="kw">SUSPEND</span></span></code></pre></div>
+<p>Change the size of the warehouse</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE MY_SMALL_WH</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SET</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;Small&#39;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>WAIT_FOR_COMPLETION <span class="op">=</span> <span class="kw">TRUE</span>; <span class="co">-- 1</span></span></code></pre></div>
+<ol type="1">
+<li><code>WAIT_FOR_COMPLETION</code> ensures all existing operations are
+complete before modifying the size</li>
+</ol>
+<h2 id="drop-warehouse">Drop Warehouse</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> WAREHOUSE MY_SMALL_WH</span></code></pre></div>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>Warehouse’s cant be <code>UNDROPPED</code>.</p>
+</blockquote>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses">Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/commands-warehouse">SQL
+Commands Reference</a></li>
+</ul>
+</body>
+</html>
