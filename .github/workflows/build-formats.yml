@@ -1,0 +1,91 @@
+name: Build PDF and HTML Formats
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '*.md'
+      - '!README.md'
+      - '!dist/**'
+      - '!.github/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pandoc
+        run: |
+          wget -q https://github.com/jgm/pandoc/releases/download/3.2/pandoc-3.2-1-amd64.deb
+          sudo dpkg -i pandoc-3.2-1-amd64.deb
+
+      - name: Install weasyprint and system dependencies
+        run: |
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1
+          pip install weasyprint
+
+      - name: Build HTML and PDF formats
+        run: |
+          mkdir -p dist
+          built_files=""
+          for f in *.md; do
+            [ "$f" = "README.md" ] && continue
+            base="${f%.md}"
+            echo "Building $base..."
+            # HTML (standalone, all resources embedded)
+            pandoc "$f" -o "dist/${base}.html" \
+              --standalone \
+              --embed-resources \
+              --highlight-style=tango \
+              --metadata title="$base" || true
+            # PDF via weasyprint
+            pandoc "$f" -o "dist/${base}.pdf" \
+              --pdf-engine=weasyprint || true
+            built_files="${built_files} ${base}"
+          done
+          echo "built_files=${built_files}" >> $GITHUB_ENV
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git status --porcelain dist/ | grep -q . && echo "no_changes=false" >> $GITHUB_OUTPUT || echo "no_changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push dist/
+        if: steps.check_changes.outputs.no_changes == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          git commit -m "chore: rebuild dist formats [skip ci]"
+          git push
+
+      - name: Build summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          for f in dist/*; do
+            [ -f "$f" ] || continue
+            size=$(du -sh "$f" | cut -f1)
+            echo "| $f | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+          if [ "${{ steps.check_changes.outputs.no_changes }}" = "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "_No changes detected — dist/ already up to date._" >> $GITHUB_STEP_SUMMARY
+          fi
