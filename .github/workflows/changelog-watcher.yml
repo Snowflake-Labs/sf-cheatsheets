@@ -1,0 +1,90 @@
+name: CoCo Changelog Watcher
+
+on:
+  schedule:
+    - cron: '0 9 1,15 * *'  # 1st and 15th of each month at 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch CoCo changelog
+        id: fetch
+        run: |
+          curl -sSf "https://docs.snowflake.com/en/user-guide/cortex-code/changelog.md" \
+            -o /tmp/changelog-new.md
+          NEW_SHA=$(sha256sum /tmp/changelog-new.md | awk '{print $1}')
+          echo "new_sha=$NEW_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Get cached SHA
+        id: cache
+        run: |
+          CACHE_FILE=".github/changelog-cache.md"
+          if [[ -f "$CACHE_FILE" ]]; then
+            CACHED_SHA=$(grep '^<!-- sha256:' "$CACHE_FILE" | sed 's/<!-- sha256: //;s/ -->//')
+          else
+            CACHED_SHA=""
+          fi
+          echo "cached_sha=$CACHED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Compare and act on changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_SHA: ${{ steps.fetch.outputs.new_sha }}
+          CACHED_SHA: ${{ steps.cache.outputs.cached_sha }}
+        run: |
+          if [[ "$NEW_SHA" == "$CACHED_SHA" ]]; then
+            echo "No changes detected in CoCo changelog. Exiting cleanly."
+            exit 0
+          fi
+
+          echo "Changelog has changed (or first run). Creating GitHub issue..."
+
+          PREVIEW=$(head -40 /tmp/changelog-new.md)
+          CHECKED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Write issue body to a temp file to avoid shell quoting/indentation issues
+          cat > /tmp/issue-body.md << 'ISSUE_EOF'
+          The [Cortex Code changelog](https://docs.snowflake.com/en/user-guide/cortex-code/changelog) has been updated.
+
+          Please review the changelog and update [`cortex-code-cheatsheet.md`](../../cortex-code-cheatsheet.md) if any new features, commands, or behaviors should be reflected.
+
+          ## Changelog preview (first 40 lines)
+
+          ```
+          ISSUE_EOF
+          echo "$PREVIEW" >> /tmp/issue-body.md
+          cat >> /tmp/issue-body.md << 'ISSUE_EOF'
+          ```
+
+          ---
+          *This issue was opened automatically by the [changelog-watcher](.github/workflows/changelog-watcher.yml) workflow.*
+          ISSUE_EOF
+
+          gh issue create \
+            --title "chore: CoCo changelog updated — review cheatsheet" \
+            --body-file /tmp/issue-body.md \
+            --label "cheatsheet-review,automated" \
+            || echo "Issue creation failed (labels may not exist, continuing)"
+
+          # Update cache file — use printf to avoid heredoc indentation issues
+          printf '<!-- CoCo changelog cache — auto-updated by changelog-watcher.yml workflow -->\n' > .github/changelog-cache.md
+          printf '<!-- Do not edit manually -->\n' >> .github/changelog-cache.md
+          printf '<!-- sha256: %s -->\n' "$NEW_SHA" >> .github/changelog-cache.md
+          printf '<!-- last-checked: %s -->\n' "$CHECKED_AT" >> .github/changelog-cache.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/changelog-cache.md
+          git diff --staged --quiet || git commit -m "chore: update CoCo changelog cache [skip ci]"
+          git push
