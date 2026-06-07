@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-06-07" />
+  <title>warehouses-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">warehouses-cheatsheet</h1>
+<p class="date">2026-06-07</p>
+</header>
+<h1 id="snowflake-warehouses-developer-cheatsheet">Snowflake Warehouses
+— Developer Cheatsheet</h1>
+<p>Virtual warehouses are Snowflake’s compute layer: required for
+queries, DML, and data load/unload. Per-second billing with a 60-second
+minimum each time a warehouse starts.</p>
+<blockquote>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/user-guide/warehouses">Warehouses</a>.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#sizes--credits">Sizes &amp; Credits</a></li>
+<li><a href="#warehouse-types">Warehouse Types</a></li>
+<li><a href="#create-standard-warehouse">Create: Standard
+Warehouse</a></li>
+<li><a href="#create-snowpark-optimized-warehouse">Create:
+Snowpark-Optimized Warehouse</a></li>
+<li><a href="#use--inspect">Use &amp; Inspect</a></li>
+<li><a href="#manage-resize--tune">Manage: Resize &amp; Tune</a></li>
+<li><a href="#multi-cluster-warehouses">Multi-cluster
+Warehouses</a></li>
+<li><a href="#resource-monitors">Resource Monitors</a></li>
+<li><a href="#monitor-usage">Monitor Usage</a></li>
+<li><a href="#permissions">Permissions</a></li>
+<li><a href="#drop">Drop</a></li>
+<li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="sizes-credits">Sizes &amp; Credits</h2>
+<p>Gen1 credits per hour (doubles at each size step):</p>
+<table>
+<thead>
+<tr class="header">
+<th>Size</th>
+<th>Credits/hour</th>
+<th>Credits/second</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X-Small</td>
+<td>1</td>
+<td>0.0003</td>
+<td>Default for <code>CREATE WAREHOUSE</code> (SQL)</td>
+</tr>
+<tr class="even">
+<td>Small</td>
+<td>2</td>
+<td>0.0006</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Medium</td>
+<td>4</td>
+<td>0.0011</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Large</td>
+<td>8</td>
+<td>0.0022</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>X-Large</td>
+<td>16</td>
+<td>0.0044</td>
+<td>Default size in Snowsight</td>
+</tr>
+<tr class="even">
+<td>2X-Large</td>
+<td>32</td>
+<td>0.0089</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>3X-Large</td>
+<td>64</td>
+<td>0.0178</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>4X-Large</td>
+<td>128</td>
+<td>0.0356</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>5X-Large</td>
+<td>256</td>
+<td>0.0711</td>
+<td>AWS + Azure GA; US Gov preview</td>
+</tr>
+<tr class="even">
+<td>6X-Large</td>
+<td>512</td>
+<td>0.1422</td>
+<td>AWS + Azure GA; US Gov preview</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!NOTE] <strong>Gen2</strong> warehouses are becoming the default
+(BCR 2026_03, pending). Gen2 uses faster hardware and delivers better
+analytics and DML performance. Gen1 credit rates above apply; Gen2 rates
+differ — see the <a href="https://www.snowflake.com/legal/snowflake-service-consumption-table/">Snowflake
+Service Consumption Table</a>. X5LARGE and X6LARGE do not support Gen2.
+<strong>Billing:</strong> 60-second minimum per start. Resize while
+running adds new compute resources immediately but charges from the
+resize time.</p>
+</blockquote>
+<h2 id="warehouse-types">Warehouse Types</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th><code>WAREHOUSE_TYPE</code></th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Standard (Gen1)</strong></td>
+<td><code>STANDARD</code> (default)</td>
+<td>General SQL queries, DML, data loading</td>
+</tr>
+<tr class="even">
+<td><strong>Standard (Gen2)</strong></td>
+<td><code>STANDARD</code> + <code>GENERATION = &#39;2&#39;</code></td>
+<td>Analytics and DML workloads; better perf than Gen1</td>
+</tr>
+<tr class="odd">
+<td><strong>Snowpark-optimized</strong></td>
+<td><code>SNOWPARK-OPTIMIZED</code></td>
+<td>ML training, stored procs with large memory needs</td>
+</tr>
+<tr class="even">
+<td><strong>Multi-cluster</strong></td>
+<td><code>STANDARD</code> + cluster settings</td>
+<td>High concurrency, many parallel users (Enterprise Edition)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="create-standard-warehouse">Create: Standard Warehouse</h2>
+<p>Minimal — defaults to X-Small, Gen1 (or Gen2 if your org/region has
+BCR 2026_03 enabled):</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE my_wh;</span></code></pre></div>
+<p>Common options in one block:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_wh</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE      <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND        <span class="op">=</span> <span class="dv">300</span>          <span class="co">-- seconds of inactivity before suspending</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  AUTO_RESUME         <span class="op">=</span> <span class="kw">TRUE</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  INITIALLY_SUSPENDED <span class="op">=</span> <span class="kw">TRUE</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">COMMENT</span>             <span class="op">=</span> <span class="st">&#39;General analytics warehouse&#39;</span>;</span></code></pre></div>
+<p>Explicitly create a Gen2 warehouse (recommended for new
+warehouses):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_gen2_wh</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;LARGE&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  GENERATION     <span class="op">=</span> <span class="st">&#39;2&#39;</span>;</span></code></pre></div>
+<p>Create with query timeout and queue timeout (prevents runaway queries
+and queue build-up):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_wh</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE                    <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND                      <span class="op">=</span> <span class="dv">300</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  STATEMENT_TIMEOUT_IN_SECONDS      <span class="op">=</span> <span class="dv">3600</span>    <span class="co">-- 1 hour max per query</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  STATEMENT_QUEUED_TIMEOUT_IN_SECONDS <span class="op">=</span> <span class="dv">600</span>   <span class="co">-- 10 min max in queue</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  INITIALLY_SUSPENDED               <span class="op">=</span> <span class="kw">TRUE</span>;</span></code></pre></div>
+<p>Key <code>CREATE WAREHOUSE</code> parameters:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Default</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>WAREHOUSE_SIZE</code></td>
+<td>X-Small</td>
+<td>Compute size; doubles credits at each step</td>
+</tr>
+<tr class="even">
+<td><code>WAREHOUSE_TYPE</code></td>
+<td>STANDARD</td>
+<td><code>STANDARD</code> or <code>SNOWPARK-OPTIMIZED</code></td>
+</tr>
+<tr class="odd">
+<td><code>GENERATION</code></td>
+<td>Org/region-dependent</td>
+<td><code>&#39;1&#39;</code> or <code>&#39;2&#39;</code>; Gen2 = better analytics
+perf</td>
+</tr>
+<tr class="even">
+<td><code>AUTO_SUSPEND</code></td>
+<td>Enabled</td>
+<td>Seconds idle before auto-suspend; <code>0</code>/<code>NULL</code> =
+never</td>
+</tr>
+<tr class="odd">
+<td><code>AUTO_RESUME</code></td>
+<td>TRUE</td>
+<td>Resume on first query</td>
+</tr>
+<tr class="even">
+<td><code>INITIALLY_SUSPENDED</code></td>
+<td>TRUE</td>
+<td>Start suspended after CREATE</td>
+</tr>
+<tr class="odd">
+<td><code>MAX_CLUSTER_COUNT</code></td>
+<td>1</td>
+<td>Enterprise: max clusters for scaling out</td>
+</tr>
+<tr class="even">
+<td><code>MIN_CLUSTER_COUNT</code></td>
+<td>1</td>
+<td>Enterprise: min clusters always running</td>
+</tr>
+</tbody>
+</table>
+<h2 id="create-snowpark-optimized-warehouse">Create: Snowpark-Optimized
+Warehouse</h2>
+<p>Use for Snowpark Python stored procedures, UDFs, and ML training
+workloads with large memory needs. Takes longer to start than a standard
+warehouse.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_ml_wh</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE <span class="op">=</span> <span class="st">&#39;SNOWPARK-OPTIMIZED&#39;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span>;             <span class="co">-- default RESOURCE_CONSTRAINT = MEMORY_16X (256 GB)</span></span></code></pre></div>
+<p>With explicit memory/CPU configuration:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_ml_wh</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE      <span class="op">=</span> <span class="st">&#39;SNOWPARK-OPTIMIZED&#39;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE      <span class="op">=</span> <span class="st">&#39;LARGE&#39;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  RESOURCE_CONSTRAINT <span class="op">=</span> <span class="st">&#39;MEMORY_16X_X86&#39;</span>;  <span class="co">-- 256 GB, x86 architecture</span></span></code></pre></div>
+<p><code>RESOURCE_CONSTRAINT</code> options for Snowpark-optimized:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Value</th>
+<th>Memory</th>
+<th>Min size</th>
+<th>Availability</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>MEMORY_1X</code> / <code>MEMORY_1X_X86</code></td>
+<td>16 GB</td>
+<td>X-Small</td>
+<td>GA, all regions</td>
+</tr>
+<tr class="even">
+<td><code>MEMORY_16X</code> / <code>MEMORY_16X_X86</code></td>
+<td>256 GB</td>
+<td>Medium</td>
+<td>GA, all regions (default)</td>
+</tr>
+<tr class="odd">
+<td><code>MEMORY_64X</code> / <code>MEMORY_64X_X86</code></td>
+<td>1 TB</td>
+<td>Large</td>
+<td>Preview, AWS only</td>
+</tr>
+</tbody>
+</table>
+<h2 id="use-inspect">Use &amp; Inspect</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> WAREHOUSE my_wh;              <span class="co">-- set active warehouse for session</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES;                  <span class="co">-- list all warehouses you have access to</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES <span class="kw">LIKE</span> <span class="st">&#39;my_%&#39;</span>;     <span class="co">-- filter by name pattern</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>DESCRIBE WAREHOUSE my_wh;        <span class="co">-- full property list</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">PARAMETERS</span> <span class="cf">FOR</span> WAREHOUSE my_wh;   <span class="co">-- session and warehouse parameters</span></span></code></pre></div>
+<h2 id="manage-resize-tune">Manage: Resize &amp; Tune</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">RESUME</span>;    <span class="co">-- manually start a suspended warehouse</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SUSPEND</span>;   <span class="co">-- manually stop a running warehouse</span></span></code></pre></div>
+<p>Resize (takes effect for new queries; existing queries keep their
+resources):</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE       <span class="op">=</span> <span class="st">&#39;LARGE&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  WAIT_FOR_COMPLETION  <span class="op">=</span> <span class="kw">TRUE</span>;   <span class="co">-- wait for existing queries to finish before resize</span></span></code></pre></div>
+<p>Adjust auto-suspend and timeouts:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND                        <span class="op">=</span> <span class="dv">120</span>    <span class="co">-- suspend after 2 min of idle</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  STATEMENT_TIMEOUT_IN_SECONDS        <span class="op">=</span> <span class="dv">1800</span>   <span class="co">-- 30 min max per query</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  STATEMENT_QUEUED_TIMEOUT_IN_SECONDS <span class="op">=</span> <span class="dv">300</span>;   <span class="co">-- 5 min max in queue</span></span></code></pre></div>
+<p>Convert an existing Gen1 warehouse to Gen2:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> GENERATION <span class="op">=</span> <span class="st">&#39;2&#39;</span>;   <span class="co">-- works running or suspended</span></span></code></pre></div>
+<p>Convert standard to Snowpark-optimized:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE      <span class="op">=</span> <span class="st">&#39;SNOWPARK-OPTIMIZED&#39;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  RESOURCE_CONSTRAINT <span class="op">=</span> <span class="st">&#39;MEMORY_1X&#39;</span>;</span></code></pre></div>
+<blockquote>
+<p>[!NOTE] Converting a running warehouse: existing queries finish on
+the old type; new queries run on the new type. You are charged for both
+during the transition period.</p>
+</blockquote>
+<h2 id="multi-cluster-warehouses">Multi-cluster Warehouses</h2>
+<p>Enterprise Edition feature. Scales out by adding clusters to handle
+concurrency spikes automatically, without manual resizing.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_concurrent_wh</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE      <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">1</span>          <span class="co">-- minimum clusters always running</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">5</span>          <span class="co">-- scale out up to 5 clusters</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  SCALING_POLICY      <span class="op">=</span> <span class="st">&#39;AUTO&#39;</span>     <span class="co">-- &#39;AUTO&#39; (default) or &#39;ECONOMY&#39;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND        <span class="op">=</span> <span class="dv">300</span>;</span></code></pre></div>
+<p>Scaling policies:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Policy</th>
+<th>Behavior</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>AUTO</code></td>
+<td>Adds clusters to minimize queuing</td>
+<td>Most workloads; prioritizes availability</td>
+</tr>
+<tr class="even">
+<td><code>ECONOMY</code></td>
+<td>Fully loads existing clusters before adding new ones</td>
+<td>Cost-sensitive; some query queuing is acceptable</td>
+</tr>
+</tbody>
+</table>
+<p>Adjust cluster count on a running multi-cluster warehouse:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_concurrent_wh <span class="kw">SET</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT <span class="op">=</span> <span class="dv">8</span>;</span></code></pre></div>
+<h2 id="resource-monitors">Resource Monitors</h2>
+<p>Cap credit spend per warehouse. When the quota is hit, Snowflake can
+notify, suspend, or suspend immediately.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">RESOURCE</span> MONITOR my_daily_cap</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WITH</span> CREDIT_QUOTA  <span class="op">=</span> <span class="dv">50</span>          <span class="co">-- credits per monitoring interval</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  FREQUENCY          <span class="op">=</span> DAILY</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  START_TIMESTAMP    <span class="op">=</span> IMMEDIATELY</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">TRIGGERS</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">75</span> <span class="kw">PERCENT</span> DO NOTIFY        <span class="co">-- email alert at 75%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">100</span> <span class="kw">PERCENT</span> DO <span class="kw">SUSPEND</span>      <span class="co">-- suspend new queries at 100%</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">110</span> <span class="kw">PERCENT</span> DO SUSPEND_IMMEDIATE;  <span class="co">-- kill running queries at 110%</span></span></code></pre></div>
+<p>Assign a resource monitor to a warehouse:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> my_daily_cap;</span></code></pre></div>
+<p>Remove a resource monitor:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> <span class="kw">NULL</span>;</span></code></pre></div>
+<h2 id="monitor-usage">Monitor Usage</h2>
+<p>Check credit consumption for all warehouses over the last 7 days:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used)           <span class="kw">AS</span> total_credits,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_compute)   <span class="kw">AS</span> compute_credits,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_cloud_services) <span class="kw">AS</span> cloud_credits</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">7</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> total_credits <span class="kw">DESC</span>;</span></code></pre></div>
+<p>Top warehouses by cost in the last 30 days:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">SUM</span>(credits_used), <span class="dv">2</span>) <span class="kw">AS</span> credits_30d</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">30</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> credits_30d <span class="kw">DESC</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<h2 id="permissions">Permissions</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span>   <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> analyst_role;  <span class="co">-- run queries</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OPERATE <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> ops_role;      <span class="co">-- start/stop/resize</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">MODIFY</span>  <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> admin_role;    <span class="co">-- change parameters</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> MONITOR <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> dba_role;      <span class="co">-- view load metrics</span></span></code></pre></div>
+<p>Revoke:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">REVOKE</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">FROM</span> <span class="kw">ROLE</span> analyst_role;</span></code></pre></div>
+<h2 id="drop">Drop</h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> WAREHOUSE my_wh;</span></code></pre></div>
+<blockquote>
+<p>[!IMPORTANT] Warehouses cannot be undropped. Verify the name before
+dropping.</p>
+</blockquote>
+<h2 id="tips-gotchas">Tips &amp; Gotchas</h2>
+<ul>
+<li><strong>Suspending drops the query cache.</strong> The first queries
+after a warehouse resumes will be slower while the cache rebuilds. Don’t
+suspend interactive/BI warehouses between queries if sub-second latency
+matters — set <code>AUTO_SUSPEND</code> to match actual gap
+patterns.</li>
+<li><strong>60-second minimum per start.</strong> Stopping a warehouse
+in the first 60 seconds doesn’t save credits — you’ve already been
+billed for that minute. Only auto-suspend after your minimum gap is
+consistently longer than 60 seconds.</li>
+<li><strong>Larger is not always faster.</strong> Small/simple queries
+don’t benefit from X-Large+. Larger warehouses help complex analytical
+queries, ML training, and high-concurrency loads. Test with your actual
+workload before sizing up.</li>
+<li><strong>Gen2 is the new default (pending).</strong> BCR 2026_03
+makes Gen2 the default for new warehouses in supported regions. New Gen2
+warehouses automatically get Query Acceleration Service (QAS) enabled
+with <code>QUERY_ACCELERATION_MAX_SCALE_FACTOR = 2</code>. Altering a
+Gen1 warehouse to Gen2 does NOT auto-enable QAS.</li>
+<li><strong>Multi-cluster requires Enterprise Edition.</strong>
+<code>MIN_CLUSTER_COUNT</code> and <code>MAX_CLUSTER_COUNT</code> are
+silently ignored on lower editions — your warehouse stays single-cluster
+even if you set <code>MAX_CLUSTER_COUNT = 5</code>.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses">Virtual
+Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses-overview">Overview
+of Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses-gen2">Gen2
+Standard Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses-snowpark-optimized">Snowpark-Optimized
+Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses-multicluster">Multi-cluster
+Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/resource-monitors">Working
+with Resource Monitors</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/create-warehouse">CREATE
+WAREHOUSE</a></li>
+</ul>
+</body>
+</html>
