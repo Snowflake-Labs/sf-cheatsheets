@@ -1,8 +1,8 @@
 ---
 authors:
   - Kamesh Sampath<kamesh.sampath@snowflake.com>
-date: "2026-06-06"
-version: "1.0"
+date: "2026-06-07"
+version: "2.0"
 tags: [cortex-code, coco, cheatsheet, developer]
 ---
 
@@ -31,7 +31,6 @@ tags: [cortex-code, coco, cheatsheet, developer]
 - [MCP Integration](#mcp-integration)
 - [Hooks](#hooks)
 - [Tips & Gotchas](#tips--gotchas)
-- [Further Reading](#further-reading)
 - [References](#references)
 
 ## Quick Start
@@ -43,6 +42,16 @@ Install on macOS/Linux:
 curl -sL https://sfc-repo.snowflakecomputing.com/cortex/install.sh | bash
 ```
 
+Enable shell completions (one-time setup):
+
+```shell
+# run in terminal
+cortex completion bash > ~/.bash_completion.d/cortex   # bash
+cortex completion zsh  > ~/.zsh/completions/_cortex    # zsh
+cortex completion fish > ~/.config/fish/completions/cortex.fish  # fish
+exec $SHELL
+```
+
 Common launch options:
 
 ```shell
@@ -50,7 +59,23 @@ Common launch options:
 cortex                                                          # launch in current directory
 cortex -c my_connection -w /path/to/project                     # set connection and working dir
 cortex --continue                                               # resume last session
+cortex --resume <session_id>                                    # resume specific session by ID
 cortex -p "list all Python files" --output-format stream-json   # one-off prompt (scripting)
+cortex -f request.txt                                           # read prompt from file and exit
+cortex -m claude-opus-4-6 -p "summarize this repo"             # specify model
+```
+
+Connections are defined in `~/.snowflake/connections.toml`. Recommended: `OAUTH_AUTHORIZATION_CODE`
+(browser-based OAuth — no stored password, tokens refreshed automatically):
+
+```toml
+[my_connection]
+account                          = "<ACCOUNT_IDENTIFIER>"
+user                             = "<USERNAME>"
+authenticator                    = "OAUTH_AUTHORIZATION_CODE"
+client_store_temporary_credential = true
+role                             = "<ROLE>"
+database                         = "<DATABASE>"
 ```
 
 ## Start Here By Role
@@ -84,11 +109,14 @@ cortex -p "list all Python files" --output-format stream-json   # one-off prompt
 
 | Command | What it does |
 | --- | --- |
-| `/plan` / `Ctrl+P` | Enter plan mode — CoCo presents a plan before making changes |
+| `/plan` | Enter plan mode — CoCo presents a plan before making changes |
+| `/plan-off` | Disable plan mode |
 | `/bypass` | Auto-approve all tool calls |
-| `/team` / `Ctrl+G` | Enable parallel teammates mode |
+| `/bypass-off` | Disable bypass mode |
+| `/team` | Enable parallel teammates mode |
 | `/bg` | Launch a background agent, keep chatting |
 | `/agents` | View and manage running subagents |
+| `/sandbox` | Manage sandbox settings (`on` / `off` / `status`) |
 
 **SQL & data:**
 
@@ -106,26 +134,28 @@ cortex -p "list all Python files" --output-format stream-json   # one-off prompt
 | --- | --- |
 | `/diff` | Review git changes fullscreen (`--staged` for staged) |
 | `/worktree <create\|list\|switch\|delete>` | Manage git worktrees |
+| `/dbt` | dbt operations and lineage |
 
 **Skills & config:** `/skill` `/rules` `/hooks` `/mcp` `/settings` `/permissions`
 
-**Utilities:** `/copy` `/share` `/secrets` `/compact` `/rewind` `/new` `/resume` `/fork` `/index` `/tgrep`
+**Utilities:** `/copy` `/share` `/secrets` `/compact` `/rewind` `/new` `/resume` `/fork`
+`/index` `/tgrep` `/tasks` `/rename` `/update`
 
 ## Keyboard Shortcuts That Matter
 
 | Shortcut | Action |
 | --- | --- |
-| `Ctrl+P` | Toggle plan mode |
-| `Ctrl+G` | Toggle team mode |
-| `Ctrl+S` | Open subagent picker |
-| `Ctrl+O` | Cycle view mode (compact → expanded → transcript) |
+| `Ctrl+P` | Toggle compact/expanded mode |
+| `Ctrl+O` | Open full transcript viewer |
 | `Ctrl+T` | Open table viewer |
+| `Ctrl+B` | View background bash processes |
+| `Ctrl+D` | Open todo/task viewer |
 | `Ctrl+C` | Interrupt / cancel |
-| `Alt+T` | Open/close fullscreen task viewer |
-| `Shift+Tab` | Cycle permission level (Confirm → Plan → Bypass) |
+| `Shift+Tab` | Cycle mode (Confirm → Plan → Bypass) |
 | `Ctrl+R` | History search (reverse) |
 | `Ctrl+J` | Insert newline in input (for multiline prompts) |
 | `Esc Esc` | Clear entire input |
+| `?` | Toggle help overlay |
 | `Ctrl+A` | Move to start of input |
 | `Ctrl+E` | Move to end of input |
 
@@ -177,10 +207,12 @@ Or from within CoCo: `!cortex search table-details "SNOWFLAKE_SAMPLE_DATA.TPCH_S
 
 | Mode | How to activate | When to use |
 | --- | --- | --- |
-| **Plan** | `/plan` or `Ctrl+P` | Any multi-file or risky change — CoCo drafts a plan before touching anything |
-| **Bypass** | `/bypass` or `Shift+Tab` | Auto-approve all tool calls (careful on prod) |
-| **Team** | `/team` or `Ctrl+G` | Spawn parallel agents for large tasks |
+| **Plan** | `/plan` | Any multi-file or risky change — CoCo drafts a plan before touching anything |
+| **Bypass** | `/bypass` | Auto-approve all tool calls (careful on prod) |
+| **Team** | `/team` | Spawn parallel agents for large tasks |
 | **Background** | `/bg` | Fire off a task, keep chatting; results arrive as a notification |
+
+`Shift+Tab` cycles through all modes: Confirm → Plan → Bypass.
 
 Git worktrees for parallel safe work: `/worktree create <branch>` gives each agent its own branch.
 
@@ -210,12 +242,20 @@ Custom skills: place a `.md` file in `.cortex/skills/` (project) or `~/.snowflak
 | --- | --- |
 | `$cortex-agent` | Build, debug, deploy Cortex Agents |
 | `$semantic-view` | Create/manage semantic views for Cortex Analyst |
-| `$snowflake-apps` | Scaffold and deploy Snowflake App Runtime apps |
-| `$deploy-to-spcs` | Deploy containers to Snowpark Container Services |
+| `$cortex-ai-functions` | AI_CLASSIFY, AI_SENTIMENT, embeddings, OCR at scale |
 | `$machine-learning` | Train models, use Model Registry, run ML jobs |
 | `$dynamic-tables` | Build incremental pipelines with Dynamic Tables |
+| `$snowpark-python` | Snowpark Python UDFs, UDAFs, stored procedures |
+| `$iceberg` | Iceberg tables: catalog integrations, external volumes |
+| `$snowflake-apps` | Scaffold and deploy Snowflake App Runtime apps |
+| `$developing-with-streamlit` | Streamlit in Snowflake: theming, custom components |
+| `$snowflake-notebooks` | Workspace notebooks: Snowpark Python + SQL cells |
+| `$deploy-to-spcs` | Deploy containers to Snowpark Container Services |
+| `$workload-performance-analysis` | SQL query performance: spilling, partition pruning |
 | `$lineage` | Trace upstream/downstream column-level lineage |
 | `$warehouse` | Analyze and right-size warehouse costs |
+
+Full list (30+): [Bundled Skills](https://docs.snowflake.com/en/user-guide/cortex-code/bundled-skills)
 
 ## Scheduling
 
@@ -265,8 +305,9 @@ cortex memory drop <id>          # remove a specific memory by ID
 
 > [!TIP]
 > Natural language works too:
-> * Say "remember that we deploy to us-east-1" and CoCo stores it.
-> * Say "what's our commit convention?" and CoCo recalls it from memory without a command.
+>
+> - Say "remember that we deploy to us-east-1" and CoCo stores it.
+> - Say "what's our commit convention?" and CoCo recalls it from memory without a command.
 
 ## Environment Variables
 
@@ -282,13 +323,20 @@ cortex memory drop <id>          # remove a specific memory by ID
 | `CORTEX_CODE_ENABLE_SNOWFLAKE_MANAGED_MCP_SERVERS` | Enable Snowflake-managed MCP servers |
 | `CORTEX_DISABLE_TODO_TOOL` | Disable the todo/task tool |
 
+Set inline for a single session:
+
+```shell
+# run in terminal
+CORTEX_ENABLE_MEMORY=1 CORTEX_BROWSER_HEADLESS=1 cortex
+```
+
 ## Settings Worth Knowing
 
 Configure via `/settings` or edit `~/.snowflake/cortex/settings.json`.
 
 | Key | Default | What it does |
 | --- | --- | --- |
-| `agentMode` | `standard` | Agent behavior profile (`standard` or `code`) |
+| `agentMode` | `standard` | `standard` = balanced; `code` = optimized for code-heavy tasks (higher tool call budget) |
 | `autoAcceptPlans` | `false` | Skip the "approve plan?" prompt |
 | `enableMemory` | `false` | Enable cross-session memory |
 | `tgrepEnabled` | `true` | Enable semantic code search |
@@ -297,6 +345,18 @@ Configure via `/settings` or edit `~/.snowflake/cortex/settings.json`.
 | `bashDefaultTimeoutMs` | `180000` | Timeout for shell commands |
 | `mcpWait` | `false` | Wait for all MCP servers before starting (useful in CI) |
 | `disableCron` | `false` | Disable `/loop` scheduling |
+| `autoUpdate` | `true` | `false` to disable automatic version updates |
+
+Minimal `~/.snowflake/cortex/settings.json` to start from:
+
+```json
+{
+  "enableMemory": true,
+  "autoAcceptPlans": false,
+  "autoUpdate": false,
+  "sqlDefaultTimeoutSeconds": 300
+}
+```
 
 ## CLI Subcommands
 
@@ -341,6 +401,12 @@ Other popular servers (all via `npx -y @modelcontextprotocol/server-<name>`):
 
 Set `mcpWait: true` in settings if MCP tools must be ready before the first prompt (CI/automation).
 
+```shell
+# run in terminal
+cortex mcp list                     # show configured servers
+cortex mcp remove <server_name>     # remove a server
+```
+
 For setup details: [MCP docs](https://docs.snowflake.com/en/user-guide/cortex-code/extensibility)
 
 ## Hooks
@@ -369,6 +435,9 @@ View and test configured hooks:
 
 - **`/plan` before anything risky.** CoCo reads the codebase, drafts a plan, and waits for your approval.
   For multi-file changes this is the difference between a clean refactor and a mess.
+- **`@file` does NOT inject content — `@{file}` does.** `@src/auth.py review this` just references the
+  path; CoCo may or may not read it. `@{src/auth.py} review this` injects the full contents every time.
+  If CoCo seems to "not know" a file, switch to `@{`.
 - **`#TABLE` loads schema automatically.** Type `#` then the table name — CoCo fetches column definitions before
   writing any SQL. No need to describe the table.
 - **`/bg` for long jobs.** Fire off a background agent to run a big refactor or analysis while you keep
@@ -387,13 +456,3 @@ View and test configured hooks:
 - [Settings Reference](https://docs.snowflake.com/en/user-guide/cortex-code/settings)
 - [Extensibility (hooks, plugins, MCP)](https://docs.snowflake.com/en/user-guide/cortex-code/extensibility)
 - [Changelog](https://docs.snowflake.com/en/user-guide/cortex-code/changelog)
-
-## Further Reading
-
-Concepts behind intent-driven development and why tools like CoCo change how builders work:
-
-- [Infrastructure as Intent: The Field Velocity Blueprint](https://blogs.kameshs.dev/infrastructure-as-intent-the-field-velocity-blueprint-e6217ef30f14)
-- [The Ghost in the Machine: Why AI Needs the Spirit of UML](https://blogs.kameshs.dev/the-ghost-in-the-machine-why-ai-needs-the-spirit-of-uml-0d8864e583e2)
-- [Intent-Driven Development: The Shift Developers Can't Ignore](https://blogs.kameshs.dev/intent-driven-development-the-shift-developers-cant-ignore-ef434f94d56c)
-- [Intent Compression Ratio: Measuring the Power of Intent](https://blogs.kameshs.dev/intent-compression-ratio-measuring-the-power-of-intent-ceb6faf2e2f9)
-- [ICR and Token Economics](https://blogs.kameshs.dev/icr-and-token-economics-9a014a75b399)
