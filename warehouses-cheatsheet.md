@@ -22,6 +22,7 @@ Per-second billing with a 60-second minimum each time a warehouse starts.
 - [Warehouse Types](#warehouse-types)
 - [Create: Standard Warehouse](#create-standard-warehouse)
 - [Create: Snowpark-Optimized Warehouse](#create-snowpark-optimized-warehouse)
+- [Create: Adaptive Warehouse](#create-adaptive-warehouse)
 - [Use & Inspect](#use--inspect)
 - [Manage: Resize & Tune](#manage-resize--tune)
 - [Multi-cluster Warehouses](#multi-cluster-warehouses)
@@ -64,6 +65,7 @@ Gen1 credits per hour (doubles at each size step):
 | **Standard (Gen1)** | `STANDARD` (default) | General SQL queries, DML, data loading |
 | **Standard (Gen2)** | `STANDARD` + `GENERATION = '2'` | Analytics and DML workloads; better perf than Gen1 |
 | **Snowpark-optimized** | `SNOWPARK-OPTIMIZED` | ML training, stored procs with large memory needs |
+| **Adaptive** | `ADAPTIVE` | Analytics/ETL with variable query sizes; no sizing or scaling management needed (Enterprise, AWS preview regions) |
 | **Multi-cluster** | `STANDARD` + cluster settings | High concurrency, many parallel users (Enterprise Edition) |
 
 ## Create: Standard Warehouse
@@ -144,6 +146,53 @@ CREATE OR REPLACE WAREHOUSE my_ml_wh
 | `MEMORY_1X` / `MEMORY_1X_X86` | 16 GB | X-Small | GA, all regions |
 | `MEMORY_16X` / `MEMORY_16X_X86` | 256 GB | Medium | GA, all regions (default) |
 | `MEMORY_64X` / `MEMORY_64X_X86` | 1 TB | Large | Preview, AWS only |
+
+## Create: Adaptive Warehouse
+
+> [!NOTE]
+> **Preview feature — Enterprise Edition required.** Available in AWS regions:
+> US West 2 (Oregon), EU West 1 (Ireland), AP Northeast 1 (Tokyo).
+
+With adaptive warehouses you do **not** set size, multi-cluster counts, QAS, or
+auto-suspend. Snowflake manages all compute automatically. All adaptive warehouses in
+an account share a dedicated compute pool and use per-query billing.
+
+Create a new adaptive warehouse (minimal):
+
+```sql
+CREATE WAREHOUSE my_adaptive_wh
+  WAREHOUSE_TYPE = ADAPTIVE;
+```
+
+With performance and throughput tuning:
+
+```sql
+CREATE WAREHOUSE my_adaptive_wh
+  WAREHOUSE_TYPE               = ADAPTIVE
+  MAX_QUERY_PERFORMANCE_LEVEL  = XLARGE   -- upper bound per query (default XLARGE)
+  QUERY_THROUGHPUT_MULTIPLIER  = 2        -- concurrency scale factor (default 2, 0 = unlimited)
+  COMMENT                      = 'Analytics warehouse — adaptive compute';
+```
+
+Convert an existing standard warehouse to adaptive (no downtime):
+
+```sql
+ALTER WAREHOUSE my_existing_wh SET WAREHOUSE_TYPE = ADAPTIVE;
+```
+
+Key parameters:
+
+| Parameter | Default | What it controls |
+| --- | --- | --- |
+| `MAX_QUERY_PERFORMANCE_LEVEL` | `XLARGE` | Per-query resource upper bound (XSMALL–X4LARGE) |
+| `QUERY_THROUGHPUT_MULTIPLIER` | `2` | Concurrency scale; `0` = unlimited burst |
+
+Enable/disable accepting new jobs (does not drop running queries):
+
+```sql
+ALTER WAREHOUSE my_adaptive_wh SUSPEND;   -- stop accepting new jobs
+ALTER WAREHOUSE my_adaptive_wh RESUME;    -- resume accepting jobs
+```
 
 ## Use & Inspect
 
@@ -334,6 +383,7 @@ DROP WAREHOUSE my_wh;
 - [Overview of Warehouses](https://docs.snowflake.com/en/user-guide/warehouses-overview)
 - [Gen2 Standard Warehouses](https://docs.snowflake.com/en/user-guide/warehouses-gen2)
 - [Snowpark-Optimized Warehouses](https://docs.snowflake.com/en/user-guide/warehouses-snowpark-optimized)
+- [Adaptive Compute](https://docs.snowflake.com/en/user-guide/warehouses-adaptive)
 - [Multi-cluster Warehouses](https://docs.snowflake.com/en/user-guide/warehouses-multicluster)
 - [Working with Resource Monitors](https://docs.snowflake.com/en/user-guide/resource-monitors)
 - [CREATE WAREHOUSE](https://docs.snowflake.com/en/sql-reference/sql/create-warehouse)
