@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="description" content="A compact guide to evaluating Retrieval-Augmented Generation (RAG) systems using core metrics: Groundedness, Context Relevance, and Answer Relevance." />
+  <meta name="dcterms.date" content="2026-06-07" />
   <title>rag-evaluation-cheatsheet</title>
   <style>
 html {
@@ -171,20 +171,39 @@ vertical-align: middle;
 <body>
 <header id="title-block-header">
 <h1 class="title">rag-evaluation-cheatsheet</h1>
+<p class="date">2026-06-07</p>
 </header>
-<h1 id="rag-evaluation-cheatsheet">🧭 <strong>RAG Evaluation
-Cheatsheet</strong></h1>
+<h1 id="rag-evaluation-developer-cheatsheet">RAG Evaluation — Developer
+Cheatsheet</h1>
+<p>Measure, diagnose, and improve Retrieval-Augmented Generation (RAG)
+performance using the three core evaluation metrics with <a href="https://www.trulens.org/">TruLens</a>.</p>
 <blockquote>
-<p><em>Measure, diagnose, and improve Retrieval-Augmented Generation
-(RAG) performance with <a href="https://www.trulens.org/">TruLens</a>.</em></p>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://www.trulens.org/docs/">TruLens documentation</a>.</p>
 </blockquote>
-<hr />
-<h2 id="the-3-core-metrics">⚙️ <strong>The 3 Core Metrics</strong></h2>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#the-3-core-metrics">The 3 Core Metrics</a></li>
+<li><a href="#1-groundedness">1. Groundedness</a></li>
+<li><a href="#2-context-relevance">2. Context Relevance</a></li>
+<li><a href="#3-answer-relevance">3. Answer Relevance</a></li>
+<li><a href="#how-the-three-metrics-work-together">How the Three Metrics
+Work Together</a></li>
+<li><a href="#end-to-end-example">End-to-End Example</a></li>
+<li><a href="#fix-order">Fix Order</a></li>
+<li><a href="#scoring-quick-view">Scoring Quick View</a></li>
+<li><a href="#quick-wins">Quick Wins</a></li>
+<li><a href="#rules-of-thumb">Rules of Thumb</a></li>
+<li><a href="#common-score-patterns">Common Score Patterns</a></li>
+<li><a href="#readiness-checklist">Readiness Checklist</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="the-3-core-metrics">The 3 Core Metrics</h2>
 <table>
 <colgroup>
-<col style="width: 28%" />
-<col style="width: 32%" />
-<col style="width: 39%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -197,125 +216,125 @@ Cheatsheet</strong></h1>
 <tr class="odd">
 <td><strong>Groundedness</strong></td>
 <td>Are all answers based on retrieved data?</td>
-<td><em>Hallucination Detector</em></td>
+<td>Hallucination Detector</td>
 </tr>
 <tr class="even">
 <td><strong>Context Relevance</strong></td>
-<td>Did we retrieve the <em>right</em> data?</td>
-<td><em>Retriever Health Check</em></td>
+<td>Did we retrieve the right data?</td>
+<td>Retriever Health Check</td>
 </tr>
 <tr class="odd">
 <td><strong>Answer Relevance</strong></td>
-<td>Did we answer the <em>actual</em> question?</td>
-<td><em>Response Quality Check</em></td>
+<td>Did we answer the actual question?</td>
+<td>Response Quality Check</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="groundedness-faithfulness-the-hallucination-detector">🧠
-<strong>1. Groundedness (Faithfulness) — “The Hallucination
-Detector”</strong></h2>
-<p><strong>Definition:</strong><br />
-Measures whether the generated answer is <em>factually supported</em> by
-the retrieved context — no hallucinations or made-up facts.</p>
-<h3 id="example">🧩 <strong>Example</strong></h3>
-<p><strong>Context Retrieved:</strong><br />
-&gt; “The Eiffel Tower was completed in 1889 and stands 330 meters
+<h2 id="groundedness">1. Groundedness</h2>
+<p>Measures whether the generated answer is factually supported by the
+retrieved context — no hallucinations or made-up facts.</p>
+<h3 id="example">Example</h3>
+<p>Context retrieved:</p>
+<blockquote>
+<p>“The Eiffel Tower was completed in 1889 and stands 330 meters
 tall.”</p>
-<p>✅ <strong>Good (Grounded):</strong><br />
-&gt; “The Eiffel Tower is 330 meters tall.”</p>
-<p>❌ <strong>Bad (Not Grounded):</strong><br />
-&gt; “The Eiffel Tower is 330 meters tall and was designed by Gustave
+</blockquote>
+<p>Good (grounded):</p>
+<blockquote>
+<p>“The Eiffel Tower is 330 meters tall.”</p>
+</blockquote>
+<p>Bad (not grounded):</p>
+<blockquote>
+<p>“The Eiffel Tower is 330 meters tall and was designed by Gustave
 Eiffel in collaboration with Leonardo da Vinci.”</p>
-<p><strong>Why Bad:</strong><br />
-Hallucinates information not supported by the context.</p>
-<hr />
-<h2 id="context-relevance-retrieval-quality-right-data-right-answer">🔍
-<strong>2. Context Relevance (Retrieval Quality) — “Right Data, Right
-Answer”</strong></h2>
-<p><strong>Definition:</strong><br />
-Measures whether the retrieved documents or chunks actually contain
-<em>information relevant</em> to answering the user’s question.</p>
-<h3 id="example-1">🧩 <strong>Example</strong></h3>
-<p><strong>User Question:</strong><br />
-&gt; “What are the health benefits of green tea?”</p>
-<p>✅ <strong>Good (Relevant Context):</strong><br />
-- “Green tea contains antioxidants called catechins that may reduce
-inflammation.”<br />
-- “Studies show green tea consumption is associated with lower
-cardiovascular disease risk.”</p>
-<p>❌ <strong>Bad (Irrelevant Context):</strong><br />
-- “The tea ceremony in Japan dates back to the 9th century.”<br />
-- “Green tea is grown primarily in China, Japan, and India.”</p>
-<p><strong>Why Bad:</strong><br />
-These contexts don’t help answer the question about health benefits.</p>
-<hr />
-<h2 id="answer-relevance-response-quality-on-topic-or-not">💬 <strong>3.
-Answer Relevance (Response Quality) — “On Topic or Not?”</strong></h2>
-<p><strong>Definition:</strong><br />
-Measures whether the generated answer actually <em>addresses the user’s
-question</em> clearly and directly.</p>
-<h3 id="example-2">🧩 <strong>Example</strong></h3>
-<p><strong>User Question:</strong><br />
-&gt; “How do I reset my password?”</p>
-<p>✅ <strong>Good (Relevant Answer):</strong><br />
-&gt; “To reset your password, click ‘Forgot Password’ on the login page,
+</blockquote>
+<p>Why bad: hallucinates information not supported by the context.</p>
+<h2 id="context-relevance">2. Context Relevance</h2>
+<p>Measures whether the retrieved documents or chunks actually contain
+information relevant to answering the user’s question.</p>
+<h3 id="example-1">Example</h3>
+<p>User question:</p>
+<blockquote>
+<p>“What are the health benefits of green tea?”</p>
+</blockquote>
+<p>Good (relevant context):</p>
+<ul>
+<li>“Green tea contains antioxidants called catechins that may reduce
+inflammation.”</li>
+<li>“Studies show green tea consumption is associated with lower
+cardiovascular disease risk.”</li>
+</ul>
+<p>Bad (irrelevant context):</p>
+<ul>
+<li>“The tea ceremony in Japan dates back to the 9th century.”</li>
+<li>“Green tea is grown primarily in China, Japan, and India.”</li>
+</ul>
+<p>Why bad: these contexts don’t help answer the question about health
+benefits.</p>
+<h2 id="answer-relevance">3. Answer Relevance</h2>
+<p>Measures whether the generated answer actually addresses the user’s
+question clearly and directly.</p>
+<h3 id="example-2">Example</h3>
+<p>User question:</p>
+<blockquote>
+<p>“How do I reset my password?”</p>
+</blockquote>
+<p>Good (relevant answer):</p>
+<blockquote>
+<p>“To reset your password, click ‘Forgot Password’ on the login page,
 enter your email, and follow the link sent to your inbox.”</p>
-<p>❌ <strong>Bad (Irrelevant Answer):</strong><br />
-&gt; “Passwords are important for security. Strong passwords should
+</blockquote>
+<p>Bad (irrelevant answer):</p>
+<blockquote>
+<p>“Passwords are important for security. Strong passwords should
 contain uppercase, lowercase, numbers, and symbols.”</p>
-<p><strong>Why Bad:</strong><br />
-Talks about passwords generally but doesn’t answer <em>how to reset</em>
-it.</p>
-<hr />
-<h2 id="how-the-three-metrics-work-together">🔄 <strong>How the Three
-Metrics Work Together</strong></h2>
+</blockquote>
+<p>Why bad: talks about passwords generally but doesn’t answer how to
+reset it.</p>
+<h2 id="how-the-three-metrics-work-together">How the Three Metrics Work
+Together</h2>
 <pre class="mermaid"><code>graph TD
     A[User Query] --&gt; B[Retrieval: Context Relevance]
     B --&gt; C[Generation: Groundedness]
     C --&gt; D[Final Answer: Answer Relevance]</code></pre>
-<p>Each stage builds on the previous: - <strong>Context
-Relevance</strong> → Did we get the <em>right data</em>?<br />
-- <strong>Groundedness</strong> → Is the answer <em>supported by that
-data</em>?<br />
-- <strong>Answer Relevance</strong> → Does the response <em>actually
-answer</em> the question?</p>
-<hr />
-<h2 id="end-to-end-example">💼 <strong>End-to-End Example</strong></h2>
-<p><strong>Query:</strong><br />
-&gt; “What is the refund policy for online orders?”</p>
-<ol type="1">
-<li><p><strong>Retrieval:</strong><br />
-→ “Online orders can be returned within 30 days for a full
-refund.”<br />
-✅ <em>High Context Relevance</em></p></li>
-<li><p><strong>Generation:</strong><br />
-→ “You can get a full refund if you return within 30 days.”<br />
-✅ <em>High Groundedness</em></p></li>
-<li><p><strong>Final Answer:</strong><br />
-→ Directly answers the refund question.<br />
-✅ <em>High Answer Relevance</em></p></li>
-</ol>
-<p><strong>Result:</strong><br />
-All three metrics high → <strong>High-quality RAG response!</strong></p>
-<hr />
-<h2 id="fix-order-context-groundedness-answer">🪜 <strong>Fix Order:
-Context → Groundedness → Answer</strong></h2>
+<p>Each stage builds on the previous:</p>
+<ul>
+<li><strong>Context Relevance:</strong> Did we get the right data?</li>
+<li><strong>Groundedness:</strong> Is the answer supported by that
+data?</li>
+<li><strong>Answer Relevance:</strong> Does the response actually answer
+the question?</li>
+</ul>
+<h2 id="end-to-end-example">End-to-End Example</h2>
+<p>Query:</p>
 <blockquote>
-<p><strong>Bad retrieval breaks everything downstream.</strong></p>
-<p>Good RAG = ✅ Right Data (Context Relevance) + 🧠 No Hallucinations
-(Groundedness) + 💬 On Topic (Answer Relevance)</p>
+<p>“What is the refund policy for online orders?”</p>
 </blockquote>
-<hr />
-<h2 id="scoring-quick-view">📊 <strong>Scoring Quick View</strong></h2>
+<ol type="1">
+<li><strong>Retrieval:</strong> “Online orders can be returned within 30
+days for a full refund.” — High Context Relevance</li>
+<li><strong>Generation:</strong> “You can get a full refund if you
+return within 30 days.” — High Groundedness</li>
+<li><strong>Final Answer:</strong> Directly answers the refund question.
+— High Answer Relevance</li>
+</ol>
+<p>All three metrics high = high-quality RAG response.</p>
+<h2 id="fix-order">Fix Order</h2>
+<blockquote>
+<p>[!NOTE] Bad retrieval breaks everything downstream. Fix in order:
+Context Relevance first, then Groundedness, then Answer Relevance.</p>
+</blockquote>
+<p>Good RAG = Right Data (Context Relevance) + No Hallucinations
+(Groundedness) + On Topic (Answer Relevance).</p>
+<h2 id="scoring-quick-view">Scoring Quick View</h2>
 <table>
 <thead>
 <tr class="header">
 <th>Metric</th>
-<th>🟢 Ship It</th>
-<th>🟡 Tune It</th>
-<th>🟠 Fix It</th>
-<th>🔴 Stop</th>
+<th>Ship It</th>
+<th>Tune It</th>
+<th>Fix It</th>
+<th>Stop</th>
 </tr>
 </thead>
 <tbody>
@@ -324,57 +343,49 @@ Context → Groundedness → Answer</strong></h2>
 <td>0.90–1.0</td>
 <td>0.70–0.89</td>
 <td>0.50–0.69</td>
-<td>&lt;0.50</td>
+<td>&lt; 0.50</td>
 </tr>
 <tr class="even">
 <td><strong>Context Relevance</strong></td>
 <td>0.80–1.0</td>
 <td>0.60–0.79</td>
 <td>0.40–0.59</td>
-<td>&lt;0.40</td>
+<td>&lt; 0.40</td>
 </tr>
 <tr class="odd">
 <td><strong>Answer Relevance</strong></td>
 <td>0.90–1.0</td>
 <td>0.70–0.89</td>
 <td>0.50–0.69</td>
-<td>&lt;0.50</td>
+<td>&lt; 0.50</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>⚖️ <strong>Note:</strong> Thresholds should be set
-<em>case-by-case</em> based on your application’s goals and tolerance
-for error.</p>
+<p>[!NOTE] Thresholds should be set case-by-case based on your
+application’s goals and tolerance for error.</p>
 </blockquote>
-<hr />
-<h2 id="quick-wins">⚡️ <strong>Quick Wins</strong></h2>
-<p><strong>If Groundedness is low:</strong><br />
-→ Add to prompt: <em>“Base your answer ONLY on the provided context. If
-unsure, say ‘I don’t have enough information.’”</em></p>
-<p><strong>If Context Relevance is low:</strong><br />
-→ Improve retrieval configuration, embedding quality, or metadata
-filtering to return more relevant context.</p>
-<p><strong>If Answer Relevance is low:</strong><br />
-→ Add to prompt: <em>“Answer the question directly and concisely. Stay
-focused on what was asked.”</em></p>
-<hr />
-<h2 id="rules-of-thumb">💡 <strong>Rules of Thumb</strong></h2>
+<h2 id="quick-wins">Quick Wins</h2>
+<p><strong>If Groundedness is low:</strong> Add to prompt: <em>“Base
+your answer ONLY on the provided context. If unsure, say ‘I don’t have
+enough information.’”</em></p>
+<p><strong>If Context Relevance is low:</strong> Improve retrieval
+configuration, embedding quality, or metadata filtering to return more
+relevant context.</p>
+<p><strong>If Answer Relevance is low:</strong> Add to prompt:
+<em>“Answer the question directly and concisely. Stay focused on what
+was asked.”</em></p>
+<h2 id="rules-of-thumb">Rules of Thumb</h2>
 <ol type="1">
-<li><strong>You can’t improve what you don’t measure.</strong><br />
-</li>
+<li><strong>You can’t improve what you don’t measure.</strong></li>
 <li><strong>Fix retrieval first</strong> — garbage in = garbage
-out.<br />
-</li>
+out.</li>
 <li><strong>All three must be high</strong> for reliable RAG
-evaluation.<br />
-</li>
+evaluation.</li>
 <li><strong>Monitor continuously</strong> — data and model drift can
 affect scores.</li>
 </ol>
-<hr />
-<h2 id="common-score-patterns">🧩 <strong>Common Score
-Patterns</strong></h2>
+<h2 id="common-score-patterns">Common Score Patterns</h2>
 <table>
 <thead>
 <tr class="header">
@@ -386,49 +397,52 @@ Patterns</strong></h2>
 <tbody>
 <tr class="odd">
 <td>All high</td>
-<td>✅ Ready for prod</td>
-<td>Deploy &amp; monitor</td>
+<td>Ready for production</td>
+<td>Deploy and monitor</td>
 </tr>
 <tr class="even">
 <td>All low</td>
-<td>💥 System broken</td>
+<td>System broken</td>
 <td>Debug fundamentals</td>
 </tr>
 <tr class="odd">
 <td>Low context</td>
-<td>🔍 Retrieval issue</td>
+<td>Retrieval issue</td>
 <td>Tune embeddings or search</td>
 </tr>
 <tr class="even">
 <td>Low groundedness</td>
-<td>🤥 Hallucination</td>
+<td>Hallucination risk</td>
 <td>Add stricter prompts</td>
 </tr>
 <tr class="odd">
 <td>Low answer</td>
-<td>📝 Prompting</td>
+<td>Prompting issue</td>
 <td>Simplify and focus</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="readiness-checklist">🧭 <strong>Readiness
-Checklist</strong></h2>
+<h2 id="readiness-checklist">Readiness Checklist</h2>
 <ul class="task-list">
 <li><label><input type="checkbox"></input>Metrics meet internal
-thresholds<br />
-</label></li>
-<li><label><input type="checkbox"></input>Tested on diverse queries<br />
-</label></li>
-<li><label><input type="checkbox"></input>Monitoring and alerts in place<br />
-</label></li>
-<li><label><input type="checkbox"></input>Escalation path defined<br />
-</label></li>
+thresholds</label></li>
+<li><label><input type="checkbox"></input>Tested on diverse
+queries</label></li>
+<li><label><input type="checkbox"></input>Monitoring and alerts in
+place</label></li>
+<li><label><input type="checkbox"></input>Escalation path defined</label></li>
 <li><label><input type="checkbox"></input>Baseline metrics
 tracked</label></li>
 </ul>
-<hr />
-<p><strong>Evaluate your RAG system with confidence — measure retrieval
-quality, factual grounding, and response accuracy using <a href="https://www.trulens.org/">TruLens</a>.</strong></p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.trulens.org/docs/">TruLens
+Documentation</a></li>
+<li><a href="https://www.trulens.org/">TruLens Home</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/cortex-search-overview">Snowflake
+Cortex Search</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-search/tutorials/cortex-search-tutorial-2-chat">RAG
+with Snowflake Cortex (Tutorial 2)</a></li>
+</ul>
 </body>
 </html>
