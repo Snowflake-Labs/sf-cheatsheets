@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-06-07" />
+  <title>spcs-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">spcs-cheatsheet</h1>
+<p class="date">2026-06-07</p>
+</header>
+<h1 id="snowpark-container-services-spcs-developer-cheatsheet">Snowpark
+Container Services (SPCS) — Developer Cheatsheet</h1>
+<p>Deploy and manage containerized workloads in Snowflake using the
+<code>snow spcs</code> CLI. Available on AWS, Azure, and GCP commercial
+regions.</p>
+<blockquote>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview">Snowpark
+Container Services docs</a>.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#compute-pool">Compute Pool</a></li>
+<li><a href="#image-registry">Image Registry</a></li>
+<li><a href="#image-repository">Image Repository</a></li>
+<li><a href="#services-long-running">Services: Long-running</a></li>
+<li><a href="#services-job-execute-job">Services: Job
+(execute-job)</a></li>
+<li><a href="#permissions">Permissions</a></li>
+<li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Services cannot be created as <code>ACCOUNTADMIN</code> — a custom
+role with specific grants is required. Run the setup script to create
+the required role, database, schema, and warehouse:</p>
+<pre class="shell"><code># run in terminal — as ACCOUNTADMIN
+curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_setup.sql \
+  | snow sql --stdin</code></pre>
+<p>This creates:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Object</th>
+<th>Name</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Role</td>
+<td><code>cheatsheets_spcs_demo_role</code></td>
+<td>Create and manage SPCS resources</td>
+</tr>
+<tr class="even">
+<td>Database</td>
+<td><code>CHEATSHEETS_DB</code></td>
+<td>Holds services and image repositories</td>
+</tr>
+<tr class="odd">
+<td>Schema</td>
+<td><code>DATA_SCHEMA</code></td>
+<td>Scopes image repositories and services</td>
+</tr>
+<tr class="even">
+<td>Warehouse</td>
+<td><code>cheatsheets_spcs_wh_s</code></td>
+<td>Used by service containers for SQL queries</td>
+</tr>
+</tbody>
+</table>
+<h2 id="compute-pool">Compute Pool</h2>
+<p>Instance families available:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Family</th>
+<th>CPU/GPU</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>CPU_X64_XS</code> / <code>S</code> / <code>M</code> /
+<code>L</code></td>
+<td>CPU</td>
+<td>Standard CPU workloads</td>
+</tr>
+<tr class="even">
+<td><code>HIGHMEM_X64_S</code> / <code>M</code> / <code>L</code></td>
+<td>CPU + high memory</td>
+<td>Memory-intensive workloads</td>
+</tr>
+<tr class="odd">
+<td><code>GPU_NV_S</code> / <code>M</code> / <code>L</code></td>
+<td>NVIDIA GPU</td>
+<td>ML inference and training</td>
+</tr>
+</tbody>
+</table>
+<p>Create a compute pool with common options in one block:</p>
+<pre class="shell"><code># run in terminal
+snow spcs compute-pool create my_pool \
+  --family CPU_X64_XS \    # required
+  --min-nodes 1 \           # scale-down floor (default: 1)
+  --max-nodes 3 \           # scale-out ceiling (default: 1)
+  --auto-suspend-secs 300 \ # idle seconds before suspend (default: 3600)
+  --auto-resume \           # auto-start on service/job request (default: true)
+  --if-not-exists</code></pre>
+<p>Lifecycle commands:</p>
+<pre class="shell"><code># run in terminal
+snow spcs compute-pool list                         # list all pools
+snow spcs compute-pool list --like &#39;my_%&#39;           # filter by name
+snow spcs compute-pool describe my_pool             # full details
+snow spcs compute-pool status my_pool               # runtime status
+snow spcs compute-pool suspend my_pool              # stop pool
+snow spcs compute-pool resume my_pool               # start pool
+snow spcs compute-pool set my_pool --auto-suspend-secs 120  # update property
+snow spcs compute-pool drop my_pool                 # remove pool</code></pre>
+<h2 id="image-registry">Image Registry</h2>
+<pre class="shell"><code># run in terminal
+snow spcs image-registry login    # docker login (requires Docker on local system)
+snow spcs image-registry token    # get auth token for current user
+snow spcs image-registry url      # get registry URL for this account</code></pre>
+<h2 id="image-repository">Image Repository</h2>
+<pre class="shell"><code># run in terminal
+snow spcs image-repository create my_repo \
+  --database CHEATSHEETS_DB \
+  --schema DATA_SCHEMA \
+  --role cheatsheets_spcs_demo_role \
+  --if-not-exists</code></pre>
+<p>Push an image to the repository:</p>
+<pre class="shell"><code># run in terminal
+REPO=$(snow spcs image-repository url my_repo \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA \
+  --role cheatsheets_spcs_demo_role)
+
+docker pull --platform=linux/amd64 nginx
+docker tag nginx &quot;$REPO/nginx&quot;
+docker push &quot;$REPO/nginx&quot;</code></pre>
+<p>List and inspect images:</p>
+<pre class="shell"><code># run in terminal
+snow spcs image-repository list \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA    # list repos
+
+snow spcs image-repository list-images my_repo \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA    # list images
+
+snow spcs image-repository list-tags my_repo \
+  --image-name=/CHEATSHEETS_DB/DATA_SCHEMA/my_repo/nginx \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA    # list tags
+
+snow spcs image-repository drop my_repo \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA    # remove repo</code></pre>
+<blockquote>
+<p>[!TIP] Use <code>--format json | jq -r &#39;.[0].image&#39;</code> to extract
+the fully qualified image name for use in a service spec.</p>
+</blockquote>
+<h2 id="services-long-running">Services: Long-running</h2>
+<p>A long-running service stays up until explicitly stopped. Snowflake
+restarts crashed containers.</p>
+<p><strong>Service spec (save as
+<code>service-spec.yaml</code>):</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">image</span><span class="kw">:</span><span class="at"> /CHEATSHEETS_DB/DATA_SCHEMA/my_repo/nginx:latest</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">readinessProbe</span><span class="kw">:</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">endpoints</span><span class="kw">:</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">public</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+<p>Create a service:</p>
+<pre class="shell"><code># run in terminal
+snow spcs service create my_svc \
+  --compute-pool my_pool \
+  --spec-path service-spec.yaml \
+  --min-instances 1 \         # minimum replicas (default: 1)
+  --max-instances 3 \         # maximum replicas
+  --query-warehouse cheatsheets_spcs_wh_s \  # warehouse for container SQL
+  --database CHEATSHEETS_DB \
+  --schema DATA_SCHEMA \
+  --role cheatsheets_spcs_demo_role \
+  --if-not-exists</code></pre>
+<p><strong>Deploy from a <code>snowflake.yml</code> project
+definition:</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># snowflake.yml</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">definition_version</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">entities</span><span class="kw">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my_svc</span><span class="kw">:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> service</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">compute_pool</span><span class="kw">:</span><span class="at"> my_pool</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec_file</span><span class="kw">:</span><span class="at"> service-spec.yaml</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">min_instances</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">max_instances</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">query_warehouse</span><span class="kw">:</span><span class="at"> cheatsheets_spcs_wh_s</span></span></code></pre></div>
+<pre class="shell"><code># run in terminal — from the directory containing snowflake.yml
+snow spcs service deploy</code></pre>
+<p>Lifecycle and inspection commands:</p>
+<pre class="shell"><code># run in terminal
+snow spcs service status my_svc        # runtime status (wait for READY)
+snow spcs service describe my_svc      # full service details
+snow spcs service list                 # list all services
+snow spcs service list --like &#39;my_%&#39;   # filter by name
+snow spcs service list-endpoints my_svc      # public/internal endpoints
+snow spcs service list-instances my_svc     # instances and their status
+snow spcs service list-containers my_svc    # containers in each instance
+snow spcs service list-roles my_svc         # service roles for endpoint access
+snow spcs service logs my_svc \
+  --container-name nginx --instance-id 0   # container logs
+snow spcs service events my_svc            # event history
+snow spcs service metrics my_svc           # performance metrics
+snow spcs service suspend my_svc           # stop accepting requests
+snow spcs service resume my_svc            # resume accepting requests
+snow spcs service set my_svc \
+  --min-instances 2 --max-instances 5      # update scaling
+snow spcs service unset my_svc --min-instances  # reset to default
+snow spcs service upgrade my_svc \
+  --spec-path service-spec.yaml            # deploy new spec
+snow spcs service drop my_svc             # remove service</code></pre>
+<p>Cleanup all resources:</p>
+<pre class="shell"><code># run in terminal
+curl https://raw.githubusercontent.com/Snowflake-Labs/sf-cheatsheets/main/samples/spcs_cleanup.sql \
+  | snow sql --stdin</code></pre>
+<h2 id="services-job-execute-job">Services: Job (execute-job)</h2>
+<p>A job service runs a container workload that terminates when all
+containers exit — like a stored procedure but containerized. Snowflake
+cleans up resources automatically.</p>
+<pre class="shell"><code># run in terminal — synchronous (waits for completion)
+snow spcs service execute-job my_job \
+  --compute-pool my_pool \
+  --spec-path job-spec.yaml \
+  --database CHEATSHEETS_DB \
+  --schema DATA_SCHEMA \
+  --role cheatsheets_spcs_demo_role
+
+# asynchronous (returns immediately, job runs in background)
+snow spcs service execute-job my_job \
+  --compute-pool my_pool \
+  --spec-path job-spec.yaml \
+  --async \
+  --database CHEATSHEETS_DB --schema DATA_SCHEMA</code></pre>
+<p>After the job completes, use
+<code>snow spcs service describe my_job</code> to inspect results. Job
+metadata is retained for 30 days.</p>
+<h2 id="permissions">Permissions</h2>
+<p>Minimum grants required for a role to create and manage SPCS
+resources:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Run as ACCOUNTADMIN</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">CREATE</span> <span class="kw">COMPUTE</span> POOL <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> BIND SERVICE ENDPOINT <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- On the target database and schema</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">DATABASE</span> mydb <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span>, <span class="kw">CREATE</span> SERVICE <span class="kw">ON</span> <span class="kw">SCHEMA</span> mydb.myschema <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- On supporting objects</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE mywh <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">COMPUTE</span> POOL my_pool <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OPERATE, MONITOR <span class="kw">ON</span> <span class="kw">COMPUTE</span> POOL my_pool <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- On the image repository (read access to pull images)</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">READ</span> <span class="kw">ON</span> IMAGE REPOSITORY mydb.myschema.my_repo <span class="kw">TO</span> <span class="kw">ROLE</span> spcs_role;</span></code></pre></div>
+<h2 id="tips-gotchas">Tips &amp; Gotchas</h2>
+<ul>
+<li><strong>No ACCOUNTADMIN for services.</strong> Service creation
+requires a custom role — attempting to use ACCOUNTADMIN fails with a
+permission error. Run <code>spcs_setup.sql</code> first.</li>
+<li><strong>Long-running vs job services.</strong> Use
+<code>snow spcs service create</code> for persistent workloads (web
+servers, APIs). Use <code>snow spcs service execute-job</code> for
+batch/ETL work that terminates. Jobs clean up compute resources
+automatically when done.</li>
+<li><strong>Image name must be fully qualified.</strong>
+<code>list-tags --image-name</code> requires the full path
+<code>/DB/SCHEMA/REPO/image</code> — use <code>list-images</code> to get
+the exact string.</li>
+<li><strong>READY status takes time.</strong> After
+<code>service create</code>, the pool needs to provision nodes. Poll
+with <code>service status</code> and wait for <code>RUNNING</code>
+before testing endpoints.</li>
+<li><strong>Compute pool cache drops on suspend.</strong> Like
+warehouses, suspending the pool clears the local node cache. Avoid
+suspending pools with latency-sensitive services unless cost savings
+outweigh cold-start time.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview">Snowpark
+Container Services overview</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/command-reference/spcs-commands/overview">snow
+spcs commands reference</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/specification-reference">Service
+specification reference</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/services/manage-images">Working
+with image registries and repositories</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/services/manage-services">Managing
+services</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowpark-container-services/overview-tutorials">SPCS
+tutorials</a></li>
+</ul>
+</body>
+</html>
