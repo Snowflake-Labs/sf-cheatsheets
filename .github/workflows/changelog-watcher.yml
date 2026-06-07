@@ -88,3 +88,94 @@ jobs:
           git add .github/changelog-cache.md
           git diff --staged --quiet || git commit -m "chore: update CoCo changelog cache [skip ci]"
           git push
+
+  # ─── Snow CLI release notes watcher ───────────────────────────────────────
+  # Monitors the year-specific Snow CLI release notes page.
+  # Update the URL each January to the new year's page (e.g. snowflake-cli-2027).
+  #
+  # TODO (future enhancement): when a change is detected, trigger Cortex Code (CoCo)
+  # to review the diff against snowflake-cli-cheatsheet.md, open a PR updating the
+  # version number and any changed/new commands, and auto-merge if markdownlint passes.
+  check-snow-cli-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Fetch Snow CLI 2026 release notes
+        id: fetch
+        run: |
+          curl -sSf "https://docs.snowflake.com/en/release-notes/clients-drivers/snowflake-cli-2026.md" \
+            -o /tmp/snow-cli-relnotes-new.md
+          NEW_SHA=$(sha256sum /tmp/snow-cli-relnotes-new.md | awk '{print $1}')
+          echo "new_sha=$NEW_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Get cached SHA
+        id: cache
+        run: |
+          CACHE_FILE=".github/snow-cli-relnotes-cache.md"
+          if [[ -f "$CACHE_FILE" ]]; then
+            CACHED_SHA=$(grep '^<!-- sha256:' "$CACHE_FILE" | sed 's/<!-- sha256: //;s/ -->//')
+          else
+            CACHED_SHA=""
+          fi
+          echo "cached_sha=$CACHED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Compare and open issue on change
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_SHA: ${{ steps.fetch.outputs.new_sha }}
+          CACHED_SHA: ${{ steps.cache.outputs.cached_sha }}
+        run: |
+          if [[ "$NEW_SHA" == "$CACHED_SHA" ]]; then
+            echo "No changes detected in Snow CLI release notes. Exiting cleanly."
+            exit 0
+          fi
+
+          echo "Release notes have changed (or first run). Creating GitHub issue..."
+
+          PREVIEW=$(head -50 /tmp/snow-cli-relnotes-new.md)
+          CHECKED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > /tmp/snow-cli-issue-body.md << 'ISSUE_EOF'
+          The [Snowflake CLI release notes](https://docs.snowflake.com/en/release-notes/clients-drivers/snowflake-cli-2026) have been updated.
+
+          Please review and update [`snowflake-cli-cheatsheet.md`](../../snowflake-cli-cheatsheet.md):
+          - New commands or flags to add
+          - `snow_cli_version` in front matter
+          - Deprecated or removed commands to clean up
+
+          <!-- TODO: future enhancement — trigger CoCo to diff the release notes against the cheatsheet,
+               generate a PR with the required updates, and auto-merge if markdownlint passes. -->
+
+          ## Release notes preview (first 50 lines)
+
+          ```
+          ISSUE_EOF
+          echo "$PREVIEW" >> /tmp/snow-cli-issue-body.md
+          cat >> /tmp/snow-cli-issue-body.md << 'ISSUE_EOF'
+          ```
+
+          ---
+          *This issue was opened automatically by the [changelog-watcher](.github/workflows/changelog-watcher.yml) workflow.*
+          ISSUE_EOF
+
+          gh issue create \
+            --title "chore: Snow CLI release notes updated — review cheatsheet" \
+            --body-file /tmp/snow-cli-issue-body.md \
+            --label "cheatsheet-review,snowflake-cli,automated" \
+            || echo "Issue creation failed (labels may not exist, continuing)"
+
+          # Update cache file
+          printf '<!-- Snow CLI release notes cache — auto-updated by changelog-watcher.yml -->\n' > .github/snow-cli-relnotes-cache.md
+          printf '<!-- Do not edit manually -->\n' >> .github/snow-cli-relnotes-cache.md
+          printf '<!-- sha256: %s -->\n' "$NEW_SHA" >> .github/snow-cli-relnotes-cache.md
+          printf '<!-- last-checked: %s -->\n' "$CHECKED_AT" >> .github/snow-cli-relnotes-cache.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/snow-cli-relnotes-cache.md
+          git diff --staged --quiet || git commit -m "chore: update Snow CLI relnotes cache [skip ci]"
+          git push
