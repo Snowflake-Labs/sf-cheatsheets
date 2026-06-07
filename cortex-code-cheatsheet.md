@@ -2,7 +2,7 @@
 authors:
   - Kamesh Sampath<kamesh.sampath@snowflake.com>
 date: "2026-06-07"
-version: "1.0"
+version: "2.0"
 tags: [cortex-code, coco, cheatsheet, developer]
 ---
 
@@ -63,6 +63,19 @@ cortex --resume <session_id>                                    # resume specifi
 cortex -p "list all Python files" --output-format stream-json   # one-off prompt (scripting)
 cortex -f request.txt                                           # read prompt from file and exit
 cortex -m claude-opus-4-6 -p "summarize this repo"             # specify model
+```
+
+Connections are defined in `~/.snowflake/connections.toml`. Recommended: `OAUTH_AUTHORIZATION_CODE`
+(browser-based OAuth — no stored password, tokens refreshed automatically):
+
+```toml
+[my_connection]
+account                          = "<ACCOUNT_IDENTIFIER>"
+user                             = "<USERNAME>"
+authenticator                    = "OAUTH_AUTHORIZATION_CODE"
+client_store_temporary_credential = true
+role                             = "<ROLE>"
+database                         = "<DATABASE>"
 ```
 
 ## Start Here By Role
@@ -323,7 +336,7 @@ Configure via `/settings` or edit `~/.snowflake/cortex/settings.json`.
 
 | Key | Default | What it does |
 | --- | --- | --- |
-| `agentMode` | `standard` | Agent behavior profile (`standard` or `code`) |
+| `agentMode` | `standard` | `standard` = balanced; `code` = optimized for code-heavy tasks (higher tool call budget) |
 | `autoAcceptPlans` | `false` | Skip the "approve plan?" prompt |
 | `enableMemory` | `false` | Enable cross-session memory |
 | `tgrepEnabled` | `true` | Enable semantic code search |
@@ -422,6 +435,9 @@ View and test configured hooks:
 
 - **`/plan` before anything risky.** CoCo reads the codebase, drafts a plan, and waits for your approval.
   For multi-file changes this is the difference between a clean refactor and a mess.
+- **`@file` does NOT inject content — `@{file}` does.** `@src/auth.py review this` just references the
+  path; CoCo may or may not read it. `@{src/auth.py} review this` injects the full contents every time.
+  If CoCo seems to "not know" a file, switch to `@{`.
 - **`#TABLE` loads schema automatically.** Type `#` then the table name — CoCo fetches column definitions before
   writing any SQL. No need to describe the table.
 - **`/bg` for long jobs.** Fire off a background agent to run a big refactor or analysis while you keep
