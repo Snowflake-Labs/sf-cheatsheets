@@ -1,4 +1,5 @@
---!jinja
+-- Run with: snow sql --stdin --env SNOWFLAKE_USER=$SNOWFLAKE_USER < samples/spcs_setup.sql
+-- Uses <% ctx.env.SNOWFLAKE_USER %> (STANDARD templating, enabled by default in snow sql)
 USE ROLE ACCOUNTADMIN;
 -- Role that will be used to create services
 CREATE ROLE IF NOT EXISTS cheatsheets_spcs_demo_role;
@@ -18,19 +19,17 @@ USE ROLE ACCOUNTADMIN;
 -- Create warehouse to be used for queries from the service
 CREATE WAREHOUSE IF NOT EXISTS cheatsheets_spcs_wh_s WITH
   WAREHOUSE_SIZE='X-SMALL'
-  -- disable auto start
   INITIALLY_SUSPENDED=TRUE
-  -- auto suspend in two mins
   AUTO_SUSPEND=120;
 
 -- grants on warehouse to cheatsheets_spcs_demo_role
 GRANT USAGE ON WAREHOUSE cheatsheets_spcs_wh_s TO ROLE cheatsheets_spcs_demo_role;
 
--- allow endpoint binding to role 
+-- allow endpoint binding to role
 GRANT BIND SERVICE ENDPOINT ON ACCOUNT TO ROLE cheatsheets_spcs_demo_role;
 
--- allow role to use and monitor compute pool
-GRANT USAGE, MONITOR ON COMPUTE POOL my_xs_compute_pool TO ROLE cheatsheets_spcs_demo_role;
+-- NOTE: GRANT on compute pool must be run AFTER the pool is created:
+--   GRANT USAGE, MONITOR ON COMPUTE POOL <pool_name> TO ROLE cheatsheets_spcs_demo_role;
 
 -- grant cheatsheets_spcs_demo_role role to current user
-GRANT ROLE cheatsheets_spcs_demo_role TO USER &{ctx.env.SNOWFLAKE_USER};
+GRANT ROLE cheatsheets_spcs_demo_role TO USER <% ctx.env.SNOWFLAKE_USER %>;
