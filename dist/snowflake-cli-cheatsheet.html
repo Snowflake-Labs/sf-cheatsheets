@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-06-07" />
+  <title>snowflake-cli-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">snowflake-cli-cheatsheet</h1>
+<p class="date">2026-06-07</p>
+</header>
+<h1 id="snowflake-cli-snow-developer-cheatsheet">Snowflake CLI
+(<code>snow</code>) — Developer Cheatsheet</h1>
+<p>The <code>snow</code> CLI for Snowflake: deploy apps, run SQL, manage
+objects, and call Cortex AI — all from your terminal or CI/CD
+pipeline.</p>
+<blockquote>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/index">Snowflake
+CLI docs</a>.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#install--update">Install &amp; Update</a></li>
+<li><a href="#quick-start-by-role">Quick Start By Role</a></li>
+<li><a href="#connection">Connection</a></li>
+<li><a href="#cortex-ai-snow-cortex">Cortex AI
+(<code>snow cortex</code>)</a></li>
+<li><a href="#sql-snow-sql">SQL (<code>snow sql</code>)</a></li>
+<li><a href="#objects-snow-object">Objects
+(<code>snow object</code>)</a></li>
+<li><a href="#stages-snow-stage">Stages
+(<code>snow stage</code>)</a></li>
+<li><a href="#streamlit-snow-streamlit">Streamlit
+(<code>snow streamlit</code>)</a></li>
+<li><a href="#apps-snow-app">Apps (<code>snow app</code>)</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+<li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="install-update">Install &amp; Update</h2>
+<pre class="shell"><code># run in terminal
+pip install snowflake-cli                     # pip (recommended)
+pipx install snowflake-cli                    # pipx (isolated)
+brew install snowflake-cli                    # macOS Homebrew
+
+snow --version                                # verify install
+snow update                                   # update to latest
+snow update 3.18.0                            # pin to specific version</code></pre>
+<h2 id="quick-start-by-role">Quick Start By Role</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>If you are a…</th>
+<th>Focus on</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Data Engineer / Analyst</strong></td>
+<td><code>snow sql</code>, <code>snow object</code>,
+<code>snow stage</code></td>
+</tr>
+<tr class="even">
+<td><strong>App Developer</strong> (Streamlit, Native Apps)</td>
+<td><code>snow streamlit</code>, <code>snow app</code></td>
+</tr>
+<tr class="odd">
+<td><strong>ML / AI Engineer</strong></td>
+<td><code>snow cortex</code>, <code>snow snowpark</code></td>
+</tr>
+<tr class="even">
+<td><strong>Platform / DevOps</strong></td>
+<td><code>snow connection</code>, <code>snow dcm</code>,
+<code>snow spcs</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="connection">Connection</h2>
+<p>Connections are defined in <code>~/.snowflake/connections.toml</code>
+(or <code>$SNOWFLAKE_HOME/connections.toml</code>).</p>
+<pre class="shell"><code># run in terminal
+snow connection add                           # interactive wizard
+snow connection add \
+  --connection-name myconn \
+  --account orgname-accountname \
+  --user myuser \
+  --authenticator OAUTH_AUTHORIZATION_CODE \  # recommended (see snowflake-gh-authn-cheatsheet)
+  --client-store-temporary-credential true
+
+snow connection list                          # list all connections
+snow connection set-default myconn           # set active default
+snow connection test -c myconn               # test a named connection
+snow connection test -x                      # test via env vars (no config needed)
+
+# Generate a workload identity token (for CI/CD OIDC flows)
+snow connection generate-workload-identity-token --workload-identity-provider OIDC</code></pre>
+<blockquote>
+<p>[!TIP] <code>-c</code> selects a named connection; <code>-x</code>
+(<code>--temporary-connection</code>) builds the connection from
+environment variables instead of <code>connections.toml</code> — ideal
+for CI/CD.</p>
+</blockquote>
+<h2 id="cortex-ai-snow-cortex">Cortex AI (<code>snow cortex</code>)</h2>
+<blockquote>
+<p>[!NOTE] Available models vary by region. Check the <a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql">supported
+models list</a> for your account. Commonly available:
+<code>claude-3-5-sonnet</code>, <code>llama3.1-70b</code>,
+<code>mistral-large2</code>, <code>snowflake-arctic</code>. Use
+<code>--model</code> to specify; default is account-level.</p>
+</blockquote>
+<p>Ask a question or run a prompt:</p>
+<pre class="shell"><code># run in terminal
+snow cortex complete &quot;Summarize the benefits of Snowflake clustering&quot;
+snow cortex complete &quot;Summarize the benefits of Snowflake clustering&quot; \
+  --model claude-3-5-sonnet
+
+# Multi-turn conversation from a JSON file
+snow cortex complete --file samples/complete_datacloud.json</code></pre>
+<p>Extract an answer from a text passage:</p>
+<pre class="shell"><code>snow cortex extract-answer \
+  &quot;What is the capital of France?&quot; \
+  &quot;France is a country in Western Europe. Its capital city is Paris.&quot;</code></pre>
+<p>Text analysis shortcuts:</p>
+<pre class="shell"><code>snow cortex sentiment samples/sentiment.txt        # sentiment score (-1 to 1)
+snow cortex summarize samples/summarize.txt         # summarize a document
+snow cortex translate samples/translate.txt \
+  --source-language French \
+  --target-language English</code></pre>
+<h2 id="sql-snow-sql">SQL (<code>snow sql</code>)</h2>
+<pre class="shell"><code># run in terminal
+snow sql -q &quot;SELECT current_version()&quot;             # inline query
+snow sql -f my_script.sql                          # run a file
+cat my_script.sql | snow sql --stdin               # pipe from stdin
+snow sql -f script.sql -c prod                     # use a specific connection
+
+# Variable substitution (STANDARD syntax — recommended)
+snow sql -q &quot;GRANT USAGE ON DATABASE &lt;% db %&gt; TO ROLE &lt;% role %&gt;&quot; \
+  -D &quot;db=mydb&quot; -D &quot;role=analyst&quot;
+
+# Access environment variables (requires snowflake.yml env section or --env)
+snow sql -q &quot;GRANT ROLE admin TO USER &lt;% ctx.env.SNOWFLAKE_USER %&gt;&quot; \
+  --env SNOWFLAKE_USER=$SNOWFLAKE_USER
+
+# Restrict to local files only (safe for untrusted SQL in CI)
+snow sql -f script.sql --local-only
+
+# Multiple files sequentially
+snow sql -f setup.sql -f data.sql -f verify.sql
+
+# Execute asynchronously (returns query ID immediately)
+snow sql -q &quot;INSERT INTO big_table SELECT * FROM source;&quot;</code></pre>
+<h2 id="objects-snow-object">Objects (<code>snow object</code>)</h2>
+<p>Manage most Snowflake objects via <code>snow object</code>:</p>
+<pre class="shell"><code># run in terminal
+snow object create warehouse mywh \
+  &#39;{&quot;warehouse_size&quot;: &quot;X-SMALL&quot;, &quot;auto_suspend&quot;: 300}&#39;
+
+snow object list warehouse                         # list warehouses
+snow object list table --like &#39;orders%&#39; \
+  --database mydb --schema public                  # filter by name pattern
+snow object list schema --in database mydb
+
+snow object describe warehouse mywh               # full details
+snow object drop table mydb.public.old_table      # drop an object</code></pre>
+<p>Supported types: <code>warehouse</code>, <code>database</code>,
+<code>schema</code>, <code>table</code>, <code>view</code>,
+<code>function</code>, <code>procedure</code>, <code>role</code>,
+<code>user</code>, <code>stage</code>, <code>task</code>,
+<code>stream</code>, <code>pipe</code>, and more. Run
+<code>snow object --help</code> for the full list.</p>
+<h2 id="stages-snow-stage">Stages (<code>snow stage</code>)</h2>
+<pre class="shell"><code># run in terminal
+snow stage create mydb.public.my_stage            # create a stage
+
+# Upload files
+snow stage copy ./data/ @mydb.public.my_stage/data/           # local → stage
+snow stage copy @mydb.public.my_stage/data/ ./local_copy/     # stage → local
+
+snow stage list @mydb.public.my_stage              # list files
+snow stage list @mydb.public.my_stage --like &#39;*.sql&#39;  # filter
+
+# Execute SQL files directly from a stage
+snow stage execute @mydb.public.my_stage/migration.sql
+
+# Remove files
+snow stage remove @mydb.public.my_stage/old_data.csv
+snow stage remove @mydb.public.my_stage/archive/     # remove a directory</code></pre>
+<h2 id="streamlit-snow-streamlit">Streamlit
+(<code>snow streamlit</code>)</h2>
+<pre class="shell"><code># run in terminal — from project directory containing snowflake.yml
+snow streamlit deploy                               # deploy to Snowflake
+snow streamlit deploy --replace                     # replace existing app
+
+snow streamlit list                                 # list all apps
+snow streamlit describe my_app                      # app details
+snow streamlit get-url my_app                       # open URL in browser
+
+# Stream live logs (SPCSv2 container runtime only; new in 3.18.0)
+snow streamlit logs my_app --tail 100               # last 100 lines
+snow streamlit logs my_app --tail 0 --follow        # follow live
+
+snow streamlit drop my_app                          # remove app</code></pre>
+<p>Minimal <code>snowflake.yml</code> for Streamlit:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">definition_version</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">entities</span><span class="kw">:</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my_app</span><span class="kw">:</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> streamlit</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">identifier</span><span class="kw">:</span><span class="at"> my_app</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> my_stage</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">main_file</span><span class="kw">:</span><span class="at"> app.py</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">query_warehouse</span><span class="kw">:</span><span class="at"> compute_wh</span></span></code></pre></div>
+<h2 id="apps-snow-app">Apps (<code>snow app</code>)</h2>
+<p>Supports both <strong>Snowflake Native Apps</strong>
+(<code>application</code>/<code>application package</code> entity types)
+and <strong>Snowflake Apps Deploy</strong> (<code>snowflake-app</code>
+entity type). The entity type in <code>snowflake.yml</code> determines
+which flow is used automatically.</p>
+<pre class="shell"><code># run in terminal
+snow app init my_native_app                        # scaffold a Native App project
+snow app setup                                     # init snowflake.yml for App Deploy (new in 3.17.0)
+
+snow app bundle                                    # bundle artifacts locally
+snow app deploy                                    # deploy to Snowflake (create or update)
+snow app deploy --no-prune                         # deploy without removing extra files
+snow app validate                                  # validate app before deploying
+
+snow app run                                       # deploy + open in browser
+snow app open                                      # open existing app in browser
+
+snow app events                                    # view app event logs
+snow app version create v1_0 --patch 0            # create a release version
+snow app version drop v1_0                        # drop a version
+
+snow app teardown                                  # remove all app objects
+snow app teardown --force                          # skip confirmation</code></pre>
+<p>Minimal <code>snowflake.yml</code> for Native App:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">definition_version</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">entities</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my_pkg</span><span class="kw">:</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> application package</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">stage</span><span class="kw">:</span><span class="at"> app_stage</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">manifest</span><span class="kw">:</span><span class="at"> manifest.yml</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">my_app</span><span class="kw">:</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> application</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">from</span><span class="kw">:</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_pkg</span></span></code></pre></div>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>Override any connection parameter without modifying
+<code>connections.toml</code>:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>What it sets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SNOWFLAKE_ACCOUNT</code></td>
+<td>Account identifier</td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_USER</code></td>
+<td>Username</td>
+</tr>
+<tr class="odd">
+<td><code>SNOWFLAKE_PASSWORD</code></td>
+<td>Password or PAT</td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_AUTHENTICATOR</code></td>
+<td>Auth method (e.g. <code>OAUTH_AUTHORIZATION_CODE</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>SNOWFLAKE_PRIVATE_KEY_RAW</code></td>
+<td>Raw private key for key-pair auth</td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_DEFAULT_CONNECTION_NAME</code></td>
+<td>Override the default connection</td>
+</tr>
+<tr class="odd">
+<td><code>SNOWFLAKE_HOME</code></td>
+<td>Override config directory (default <code>~/.snowflake</code>)</td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_CONNECTIONS_&lt;NAME&gt;_&lt;PARAM&gt;</code></td>
+<td>Override one param of a named connection</td>
+</tr>
+<tr class="odd">
+<td><code>SNOWFLAKE_ENHANCED_EXIT_CODES</code></td>
+<td><code>1</code> for differentiated exit codes (2=bad params, 5=query
+error)</td>
+</tr>
+</tbody>
+</table>
+<p>Per-connection override example — override just the role for a named
+connection <code>myconn</code>:</p>
+<pre class="shell"><code># run in terminal
+SNOWFLAKE_CONNECTIONS_MYCONN_ROLE=analyst snow sql -q &quot;SELECT current_role()&quot;</code></pre>
+<h2 id="tips-gotchas">Tips &amp; Gotchas</h2>
+<ul>
+<li><strong><code>-x</code> is the CI pattern.</strong>
+<code>snow connection test -x</code> and
+<code>snow sql -f script.sql -x</code> use environment variables
+(<code>SNOWFLAKE_ACCOUNT</code>, <code>SNOWFLAKE_USER</code>, etc.)
+instead of <code>connections.toml</code> — no config file needed on
+runners. Pair with OIDC for secretless CI.</li>
+<li><strong><code>&lt;% var %&gt;</code> is the recommended template
+syntax.</strong> The legacy <code>&amp;variable_name</code> still works
+but is deprecated. Use <code>&lt;% ctx.env.VAR %&gt;</code> to read from
+environment variables passed with <code>--env VAR=value</code>, not
+<code>&amp;{ctx.env.VAR}</code> (mixed syntax that does not work).</li>
+<li><strong><code>--local-only</code> for trusted SQL
+enforcement.</strong> Added in 3.19.0: prevents <code>!source</code> and
+<code>!load</code> from fetching URLs, so SQL files cannot pull in
+remote content. Use in CI when you want to guarantee no outbound
+requests from SQL execution.</li>
+<li><strong><code>snow app</code> entity type is automatic.</strong>
+Since 3.17.0, the same <code>snow app deploy</code> command works for
+both Native Apps and Snowflake Apps Deploy — the <code>type:</code>
+field in <code>snowflake.yml</code> selects the behavior. No separate
+command groups needed.</li>
+<li><strong>Private key passphrase lookups changed in 3.17.1.</strong>
+The passphrase is now read from <code>private_key_file_pwd</code> or
+<code>private_key_passphrase</code> in config. The
+<code>PRIVATE_KEY_PASSPHRASE</code> env var still takes precedence when
+set.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/index">Snowflake
+CLI documentation</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/command-reference/overview">CLI
+command reference</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/sql/execute-sql">snow
+sql — executing SQL</a></li>
+<li><a href="https://docs.snowflake.com/en/release-notes/clients-drivers/snowflake-cli-2026">Snowflake
+CLI 2026 release notes</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql">Cortex
+LLM supported models</a></li>
+</ul>
+</body>
+</html>
