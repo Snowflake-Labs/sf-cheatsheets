@@ -253,6 +253,8 @@ documentation. For the authoritative reference, see <a href="https://docs.snowfl
 Warehouse</a></li>
 <li><a href="#create-snowpark-optimized-warehouse">Create:
 Snowpark-Optimized Warehouse</a></li>
+<li><a href="#create-adaptive-warehouse">Create: Adaptive
+Warehouse</a></li>
 <li><a href="#use--inspect">Use &amp; Inspect</a></li>
 <li><a href="#manage-resize--tune">Manage: Resize &amp; Tune</a></li>
 <li><a href="#multi-cluster-warehouses">Multi-cluster
@@ -379,6 +381,12 @@ resize time.</p>
 <td>ML training, stored procs with large memory needs</td>
 </tr>
 <tr class="even">
+<td><strong>Adaptive</strong></td>
+<td><code>ADAPTIVE</code></td>
+<td>Analytics/ETL with variable query sizes; no sizing or scaling
+management needed (Enterprise, AWS preview regions)</td>
+</tr>
+<tr class="odd">
 <td><strong>Multi-cluster</strong></td>
 <td><code>STANDARD</code> + cluster settings</td>
 <td>High concurrency, many parallel users (Enterprise Edition)</td>
@@ -518,33 +526,85 @@ warehouse.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="create-adaptive-warehouse">Create: Adaptive Warehouse</h2>
+<blockquote>
+<p>[!NOTE] <strong>Preview feature — Enterprise Edition
+required.</strong> Available in AWS regions: US West 2 (Oregon), EU West
+1 (Ireland), AP Northeast 1 (Tokyo).</p>
+</blockquote>
+<p>With adaptive warehouses you do <strong>not</strong> set size,
+multi-cluster counts, QAS, or auto-suspend. Snowflake manages all
+compute automatically. All adaptive warehouses in an account share a
+dedicated compute pool and use per-query billing.</p>
+<p>Create a new adaptive warehouse (minimal):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE my_adaptive_wh</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE <span class="op">=</span> ADAPTIVE;</span></code></pre></div>
+<p>With performance and throughput tuning:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> WAREHOUSE my_adaptive_wh</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE               <span class="op">=</span> ADAPTIVE</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  MAX_QUERY_PERFORMANCE_LEVEL  <span class="op">=</span> XLARGE   <span class="co">-- upper bound per query (default XLARGE)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  QUERY_THROUGHPUT_MULTIPLIER  <span class="op">=</span> <span class="dv">2</span>        <span class="co">-- concurrency scale factor (default 2, 0 = unlimited)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">COMMENT</span>                      <span class="op">=</span> <span class="st">&#39;Analytics warehouse — adaptive compute&#39;</span>;</span></code></pre></div>
+<p>Convert an existing standard warehouse to adaptive (no downtime):</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_existing_wh <span class="kw">SET</span> WAREHOUSE_TYPE <span class="op">=</span> ADAPTIVE;</span></code></pre></div>
+<p>Key parameters:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Default</th>
+<th>What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>MAX_QUERY_PERFORMANCE_LEVEL</code></td>
+<td><code>XLARGE</code></td>
+<td>Per-query resource upper bound (XSMALL–X4LARGE)</td>
+</tr>
+<tr class="even">
+<td><code>QUERY_THROUGHPUT_MULTIPLIER</code></td>
+<td><code>2</code></td>
+<td>Concurrency scale; <code>0</code> = unlimited burst</td>
+</tr>
+</tbody>
+</table>
+<p>Enable/disable accepting new jobs (does not drop running
+queries):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_adaptive_wh <span class="kw">SUSPEND</span>;   <span class="co">-- stop accepting new jobs</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_adaptive_wh <span class="kw">RESUME</span>;    <span class="co">-- resume accepting jobs</span></span></code></pre></div>
 <h2 id="use-inspect">Use &amp; Inspect</h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> WAREHOUSE my_wh;              <span class="co">-- set active warehouse for session</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES;                  <span class="co">-- list all warehouses you have access to</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES <span class="kw">LIKE</span> <span class="st">&#39;my_%&#39;</span>;     <span class="co">-- filter by name pattern</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>DESCRIBE WAREHOUSE my_wh;        <span class="co">-- full property list</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">PARAMETERS</span> <span class="cf">FOR</span> WAREHOUSE my_wh;   <span class="co">-- session and warehouse parameters</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> WAREHOUSE my_wh;              <span class="co">-- set active warehouse for session</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES;                  <span class="co">-- list all warehouses you have access to</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>SHOW WAREHOUSES <span class="kw">LIKE</span> <span class="st">&#39;my_%&#39;</span>;     <span class="co">-- filter by name pattern</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>DESCRIBE WAREHOUSE my_wh;        <span class="co">-- full property list</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">PARAMETERS</span> <span class="cf">FOR</span> WAREHOUSE my_wh;   <span class="co">-- session and warehouse parameters</span></span></code></pre></div>
 <h2 id="manage-resize-tune">Manage: Resize &amp; Tune</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">RESUME</span>;    <span class="co">-- manually start a suspended warehouse</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SUSPEND</span>;   <span class="co">-- manually stop a running warehouse</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">RESUME</span>;    <span class="co">-- manually start a suspended warehouse</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SUSPEND</span>;   <span class="co">-- manually stop a running warehouse</span></span></code></pre></div>
 <p>Resize (takes effect for new queries; existing queries keep their
 resources):</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE       <span class="op">=</span> <span class="st">&#39;LARGE&#39;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  WAIT_FOR_COMPLETION  <span class="op">=</span> <span class="kw">TRUE</span>;   <span class="co">-- wait for existing queries to finish before resize</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE       <span class="op">=</span> <span class="st">&#39;LARGE&#39;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  WAIT_FOR_COMPLETION  <span class="op">=</span> <span class="kw">TRUE</span>;   <span class="co">-- wait for existing queries to finish before resize</span></span></code></pre></div>
 <p>Adjust auto-suspend and timeouts:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND                        <span class="op">=</span> <span class="dv">120</span>    <span class="co">-- suspend after 2 min of idle</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  STATEMENT_TIMEOUT_IN_SECONDS        <span class="op">=</span> <span class="dv">1800</span>   <span class="co">-- 30 min max per query</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  STATEMENT_QUEUED_TIMEOUT_IN_SECONDS <span class="op">=</span> <span class="dv">300</span>;   <span class="co">-- 5 min max in queue</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND                        <span class="op">=</span> <span class="dv">120</span>    <span class="co">-- suspend after 2 min of idle</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  STATEMENT_TIMEOUT_IN_SECONDS        <span class="op">=</span> <span class="dv">1800</span>   <span class="co">-- 30 min max per query</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  STATEMENT_QUEUED_TIMEOUT_IN_SECONDS <span class="op">=</span> <span class="dv">300</span>;   <span class="co">-- 5 min max in queue</span></span></code></pre></div>
 <p>Convert an existing Gen1 warehouse to Gen2:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> GENERATION <span class="op">=</span> <span class="st">&#39;2&#39;</span>;   <span class="co">-- works running or suspended</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> GENERATION <span class="op">=</span> <span class="st">&#39;2&#39;</span>;   <span class="co">-- works running or suspended</span></span></code></pre></div>
 <p>Convert standard to Snowpark-optimized:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE      <span class="op">=</span> <span class="st">&#39;SNOWPARK-OPTIMIZED&#39;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  RESOURCE_CONSTRAINT <span class="op">=</span> <span class="st">&#39;MEMORY_1X&#39;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_TYPE      <span class="op">=</span> <span class="st">&#39;SNOWPARK-OPTIMIZED&#39;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  RESOURCE_CONSTRAINT <span class="op">=</span> <span class="st">&#39;MEMORY_1X&#39;</span>;</span></code></pre></div>
 <blockquote>
 <p>[!NOTE] Converting a running warehouse: existing queries finish on
 the old type; new queries run on the new type. You are charged for both
@@ -553,12 +613,12 @@ during the transition period.</p>
 <h2 id="multi-cluster-warehouses">Multi-cluster Warehouses</h2>
 <p>Enterprise Edition feature. Scales out by adding clusters to handle
 concurrency spikes automatically, without manual resizing.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_concurrent_wh</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE      <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">1</span>          <span class="co">-- minimum clusters always running</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">5</span>          <span class="co">-- scale out up to 5 clusters</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  SCALING_POLICY      <span class="op">=</span> <span class="st">&#39;AUTO&#39;</span>     <span class="co">-- &#39;AUTO&#39; (default) or &#39;ECONOMY&#39;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND        <span class="op">=</span> <span class="dv">300</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> WAREHOUSE my_concurrent_wh</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE_SIZE      <span class="op">=</span> <span class="st">&#39;MEDIUM&#39;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">1</span>          <span class="co">-- minimum clusters always running</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT   <span class="op">=</span> <span class="dv">5</span>          <span class="co">-- scale out up to 5 clusters</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  SCALING_POLICY      <span class="op">=</span> <span class="st">&#39;AUTO&#39;</span>     <span class="co">-- &#39;AUTO&#39; (default) or &#39;ECONOMY&#39;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  AUTO_SUSPEND        <span class="op">=</span> <span class="dv">300</span>;</span></code></pre></div>
 <p>Scaling policies:</p>
 <table>
 <colgroup>
@@ -587,53 +647,53 @@ concurrency spikes automatically, without manual resizing.</p>
 </tbody>
 </table>
 <p>Adjust cluster count on a running multi-cluster warehouse:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_concurrent_wh <span class="kw">SET</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT <span class="op">=</span> <span class="dv">8</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_concurrent_wh <span class="kw">SET</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  MIN_CLUSTER_COUNT <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  MAX_CLUSTER_COUNT <span class="op">=</span> <span class="dv">8</span>;</span></code></pre></div>
 <h2 id="resource-monitors">Resource Monitors</h2>
 <p>Cap credit spend per warehouse. When the quota is hit, Snowflake can
 notify, suspend, or suspend immediately.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">RESOURCE</span> MONITOR my_daily_cap</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WITH</span> CREDIT_QUOTA  <span class="op">=</span> <span class="dv">50</span>          <span class="co">-- credits per monitoring interval</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  FREQUENCY          <span class="op">=</span> DAILY</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  START_TIMESTAMP    <span class="op">=</span> IMMEDIATELY</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">TRIGGERS</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">75</span> <span class="kw">PERCENT</span> DO NOTIFY        <span class="co">-- email alert at 75%</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">100</span> <span class="kw">PERCENT</span> DO <span class="kw">SUSPEND</span>      <span class="co">-- suspend new queries at 100%</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">110</span> <span class="kw">PERCENT</span> DO SUSPEND_IMMEDIATE;  <span class="co">-- kill running queries at 110%</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">RESOURCE</span> MONITOR my_daily_cap</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">WITH</span> CREDIT_QUOTA  <span class="op">=</span> <span class="dv">50</span>          <span class="co">-- credits per monitoring interval</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  FREQUENCY          <span class="op">=</span> DAILY</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  START_TIMESTAMP    <span class="op">=</span> IMMEDIATELY</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">TRIGGERS</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">75</span> <span class="kw">PERCENT</span> DO NOTIFY        <span class="co">-- email alert at 75%</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">100</span> <span class="kw">PERCENT</span> DO <span class="kw">SUSPEND</span>      <span class="co">-- suspend new queries at 100%</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ON</span> <span class="dv">110</span> <span class="kw">PERCENT</span> DO SUSPEND_IMMEDIATE;  <span class="co">-- kill running queries at 110%</span></span></code></pre></div>
 <p>Assign a resource monitor to a warehouse:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> my_daily_cap;</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> my_daily_cap;</span></code></pre></div>
 <p>Remove a resource monitor:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> <span class="kw">NULL</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> WAREHOUSE my_wh <span class="kw">SET</span> RESOURCE_MONITOR <span class="op">=</span> <span class="kw">NULL</span>;</span></code></pre></div>
 <h2 id="monitor-usage">Monitor Usage</h2>
 <p>Check credit consumption for all warehouses over the last 7 days:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used)           <span class="kw">AS</span> total_credits,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_compute)   <span class="kw">AS</span> compute_credits,</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_cloud_services) <span class="kw">AS</span> cloud_credits</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">7</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> total_credits <span class="kw">DESC</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used)           <span class="kw">AS</span> total_credits,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_compute)   <span class="kw">AS</span> compute_credits,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">SUM</span>(credits_used_cloud_services) <span class="kw">AS</span> cloud_credits</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">7</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> total_credits <span class="kw">DESC</span>;</span></code></pre></div>
 <p>Top warehouses by cost in the last 30 days:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">SUM</span>(credits_used), <span class="dv">2</span>) <span class="kw">AS</span> credits_30d</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">30</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> credits_30d <span class="kw">DESC</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  warehouse_name,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">SUM</span>(credits_used), <span class="dv">2</span>) <span class="kw">AS</span> credits_30d</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> start_time <span class="op">&gt;=</span> DATEADD(<span class="st">&#39;day&#39;</span>, <span class="op">-</span><span class="dv">30</span>, <span class="fu">CURRENT_TIMESTAMP</span>())</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dv">1</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="kw">ORDER</span> <span class="kw">BY</span> credits_30d <span class="kw">DESC</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span>;</span></code></pre></div>
 <h2 id="permissions">Permissions</h2>
-<div class="sourceCode" id="cb20"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span>   <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> analyst_role;  <span class="co">-- run queries</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OPERATE <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> ops_role;      <span class="co">-- start/stop/resize</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">MODIFY</span>  <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> admin_role;    <span class="co">-- change parameters</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> MONITOR <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> dba_role;      <span class="co">-- view load metrics</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span>   <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> analyst_role;  <span class="co">-- run queries</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OPERATE <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> ops_role;      <span class="co">-- start/stop/resize</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">MODIFY</span>  <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> admin_role;    <span class="co">-- change parameters</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> MONITOR <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> dba_role;      <span class="co">-- view load metrics</span></span></code></pre></div>
 <p>Revoke:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">REVOKE</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">FROM</span> <span class="kw">ROLE</span> analyst_role;</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">REVOKE</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">FROM</span> <span class="kw">ROLE</span> analyst_role;</span></code></pre></div>
 <h2 id="drop">Drop</h2>
-<div class="sourceCode" id="cb22"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> WAREHOUSE my_wh;</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> WAREHOUSE my_wh;</span></code></pre></div>
 <blockquote>
 <p>[!IMPORTANT] Warehouses cannot be undropped. Verify the name before
 dropping.</p>
@@ -673,6 +733,8 @@ of Warehouses</a></li>
 Standard Warehouses</a></li>
 <li><a href="https://docs.snowflake.com/en/user-guide/warehouses-snowpark-optimized">Snowpark-Optimized
 Warehouses</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/warehouses-adaptive">Adaptive
+Compute</a></li>
 <li><a href="https://docs.snowflake.com/en/user-guide/warehouses-multicluster">Multi-cluster
 Warehouses</a></li>
 <li><a href="https://docs.snowflake.com/en/user-guide/resource-monitors">Working
