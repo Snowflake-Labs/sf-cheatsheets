@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="dcterms.date" content="2026-06-06" />
+  <meta name="dcterms.date" content="2026-06-07" />
   <title>cortex-code-cheatsheet</title>
   <style>
 html {
@@ -166,12 +166,75 @@ margin: 0 0.8em 0.2em -1.6em;
 vertical-align: middle;
 }
 .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
 </style>
 </head>
 <body>
 <header id="title-block-header">
 <h1 class="title">cortex-code-cheatsheet</h1>
-<p class="date">2026-06-06</p>
+<p class="date">2026-06-07</p>
 </header>
 <h1 id="cortex-code-coco-developer-cheatsheet">Cortex Code (CoCo) —
 Developer Cheatsheet</h1>
@@ -204,19 +267,38 @@ Shortcuts</a></li>
 <li><a href="#mcp-integration">MCP Integration</a></li>
 <li><a href="#hooks">Hooks</a></li>
 <li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
-<li><a href="#further-reading">Further Reading</a></li>
 <li><a href="#references">References</a></li>
 </ul>
 <h2 id="quick-start">Quick Start</h2>
 <p>Install on macOS/Linux:</p>
 <pre class="shell"><code># run in terminal
 curl -sL https://sfc-repo.snowflakecomputing.com/cortex/install.sh | bash</code></pre>
+<p>Enable shell completions (one-time setup):</p>
+<pre class="shell"><code># run in terminal
+cortex completion bash &gt; ~/.bash_completion.d/cortex   # bash
+cortex completion zsh  &gt; ~/.zsh/completions/_cortex    # zsh
+cortex completion fish &gt; ~/.config/fish/completions/cortex.fish  # fish
+exec $SHELL</code></pre>
 <p>Common launch options:</p>
 <pre class="shell"><code># run in terminal
 cortex                                                          # launch in current directory
 cortex -c my_connection -w /path/to/project                     # set connection and working dir
 cortex --continue                                               # resume last session
-cortex -p &quot;list all Python files&quot; --output-format stream-json   # one-off prompt (scripting)</code></pre>
+cortex --resume &lt;session_id&gt;                                    # resume specific session by ID
+cortex -p &quot;list all Python files&quot; --output-format stream-json   # one-off prompt (scripting)
+cortex -f request.txt                                           # read prompt from file and exit
+cortex -m claude-opus-4-6 -p &quot;summarize this repo&quot;             # specify model</code></pre>
+<p>Connections are defined in
+<code>~/.snowflake/connections.toml</code>. Recommended:
+<code>OAUTH_AUTHORIZATION_CODE</code> (browser-based OAuth — no stored
+password, tokens refreshed automatically):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[my_connection]</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="dt">account</span>                          <span class="op">=</span> <span class="st">&quot;&lt;ACCOUNT_IDENTIFIER&gt;&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="dt">user</span>                             <span class="op">=</span> <span class="st">&quot;&lt;USERNAME&gt;&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dt">authenticator</span>                    <span class="op">=</span> <span class="st">&quot;OAUTH_AUTHORIZATION_CODE&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dt">client_store_temporary_credential</span> <span class="op">=</span> <span class="cn">true</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">role</span>                             <span class="op">=</span> <span class="st">&quot;&lt;ROLE&gt;&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dt">database</span>                         <span class="op">=</span> <span class="st">&quot;&lt;DATABASE&gt;&quot;</span></span></code></pre></div>
 <h2 id="start-here-by-role">Start Here By Role</h2>
 <table>
 <colgroup>
@@ -335,15 +417,23 @@ Actually Use</h2>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>/plan</code> / <code>Ctrl+P</code></td>
+<td><code>/plan</code></td>
 <td>Enter plan mode — CoCo presents a plan before making changes</td>
 </tr>
 <tr class="even">
+<td><code>/plan-off</code></td>
+<td>Disable plan mode</td>
+</tr>
+<tr class="odd">
 <td><code>/bypass</code></td>
 <td>Auto-approve all tool calls</td>
 </tr>
+<tr class="even">
+<td><code>/bypass-off</code></td>
+<td>Disable bypass mode</td>
+</tr>
 <tr class="odd">
-<td><code>/team</code> / <code>Ctrl+G</code></td>
+<td><code>/team</code></td>
 <td>Enable parallel teammates mode</td>
 </tr>
 <tr class="even">
@@ -353,6 +443,11 @@ Actually Use</h2>
 <tr class="odd">
 <td><code>/agents</code></td>
 <td>View and manage running subagents</td>
+</tr>
+<tr class="even">
+<td><code>/sandbox</code></td>
+<td>Manage sandbox settings (<code>on</code> / <code>off</code> /
+<code>status</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -405,6 +500,10 @@ staged)</td>
 <td><code>/worktree &lt;create\|list\|switch\|delete&gt;</code></td>
 <td>Manage git worktrees</td>
 </tr>
+<tr class="odd">
+<td><code>/dbt</code></td>
+<td>dbt operations and lineage</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Skills &amp; config:</strong> <code>/skill</code>
@@ -413,7 +512,8 @@ staged)</td>
 <p><strong>Utilities:</strong> <code>/copy</code> <code>/share</code>
 <code>/secrets</code> <code>/compact</code> <code>/rewind</code>
 <code>/new</code> <code>/resume</code> <code>/fork</code>
-<code>/index</code> <code>/tgrep</code></p>
+<code>/index</code> <code>/tgrep</code> <code>/tasks</code>
+<code>/rename</code> <code>/update</code></p>
 <h2 id="keyboard-shortcuts-that-matter">Keyboard Shortcuts That
 Matter</h2>
 <table>
@@ -426,47 +526,47 @@ Matter</h2>
 <tbody>
 <tr class="odd">
 <td><code>Ctrl+P</code></td>
-<td>Toggle plan mode</td>
-</tr>
-<tr class="even">
-<td><code>Ctrl+G</code></td>
-<td>Toggle team mode</td>
-</tr>
-<tr class="odd">
-<td><code>Ctrl+S</code></td>
-<td>Open subagent picker</td>
+<td>Toggle compact/expanded mode</td>
 </tr>
 <tr class="even">
 <td><code>Ctrl+O</code></td>
-<td>Cycle view mode (compact → expanded → transcript)</td>
+<td>Open full transcript viewer</td>
 </tr>
 <tr class="odd">
 <td><code>Ctrl+T</code></td>
 <td>Open table viewer</td>
 </tr>
 <tr class="even">
+<td><code>Ctrl+B</code></td>
+<td>View background bash processes</td>
+</tr>
+<tr class="odd">
+<td><code>Ctrl+D</code></td>
+<td>Open todo/task viewer</td>
+</tr>
+<tr class="even">
 <td><code>Ctrl+C</code></td>
 <td>Interrupt / cancel</td>
 </tr>
 <tr class="odd">
-<td><code>Alt+T</code></td>
-<td>Open/close fullscreen task viewer</td>
+<td><code>Shift+Tab</code></td>
+<td>Cycle mode (Confirm → Plan → Bypass)</td>
 </tr>
 <tr class="even">
-<td><code>Shift+Tab</code></td>
-<td>Cycle permission level (Confirm → Plan → Bypass)</td>
-</tr>
-<tr class="odd">
 <td><code>Ctrl+R</code></td>
 <td>History search (reverse)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>Ctrl+J</code></td>
 <td>Insert newline in input (for multiline prompts)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Esc Esc</code></td>
 <td>Clear entire input</td>
+</tr>
+<tr class="odd">
+<td><code>?</code></td>
+<td>Toggle help overlay</td>
 </tr>
 <tr class="even">
 <td><code>Ctrl+A</code></td>
@@ -552,18 +652,18 @@ setup). Other schemas: <code>TPCDS_SF10TCL</code> (retail),
 <tbody>
 <tr class="odd">
 <td><strong>Plan</strong></td>
-<td><code>/plan</code> or <code>Ctrl+P</code></td>
+<td><code>/plan</code></td>
 <td>Any multi-file or risky change — CoCo drafts a plan before touching
 anything</td>
 </tr>
 <tr class="even">
 <td><strong>Bypass</strong></td>
-<td><code>/bypass</code> or <code>Shift+Tab</code></td>
+<td><code>/bypass</code></td>
 <td>Auto-approve all tool calls (careful on prod)</td>
 </tr>
 <tr class="odd">
 <td><strong>Team</strong></td>
-<td><code>/team</code> or <code>Ctrl+G</code></td>
+<td><code>/team</code></td>
 <td>Spawn parallel agents for large tasks</td>
 </tr>
 <tr class="even">
@@ -574,6 +674,8 @@ notification</td>
 </tr>
 </tbody>
 </table>
+<p><code>Shift+Tab</code> cycles through all modes: Confirm → Plan →
+Bypass.</p>
 <p>Git worktrees for parallel safe work:
 <code>/worktree create &lt;branch&gt;</code> gives each agent its own
 branch.</p>
@@ -592,6 +694,10 @@ cortex skill add &lt;name&gt;</code></pre>
 <code>~/.snowflake/cortex/skills/</code> (global).</p>
 <p><strong>Bundled skills:</strong></p>
 <table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Skill</th>
@@ -608,20 +714,44 @@ cortex skill add &lt;name&gt;</code></pre>
 <td>Create/manage semantic views for Cortex Analyst</td>
 </tr>
 <tr class="odd">
-<td><code>$snowflake-apps</code></td>
-<td>Scaffold and deploy Snowflake App Runtime apps</td>
+<td><code>$cortex-ai-functions</code></td>
+<td>AI_CLASSIFY, AI_SENTIMENT, embeddings, OCR at scale</td>
 </tr>
 <tr class="even">
-<td><code>$deploy-to-spcs</code></td>
-<td>Deploy containers to Snowpark Container Services</td>
-</tr>
-<tr class="odd">
 <td><code>$machine-learning</code></td>
 <td>Train models, use Model Registry, run ML jobs</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>$dynamic-tables</code></td>
 <td>Build incremental pipelines with Dynamic Tables</td>
+</tr>
+<tr class="even">
+<td><code>$snowpark-python</code></td>
+<td>Snowpark Python UDFs, UDAFs, stored procedures</td>
+</tr>
+<tr class="odd">
+<td><code>$iceberg</code></td>
+<td>Iceberg tables: catalog integrations, external volumes</td>
+</tr>
+<tr class="even">
+<td><code>$snowflake-apps</code></td>
+<td>Scaffold and deploy Snowflake App Runtime apps</td>
+</tr>
+<tr class="odd">
+<td><code>$developing-with-streamlit</code></td>
+<td>Streamlit in Snowflake: theming, custom components</td>
+</tr>
+<tr class="even">
+<td><code>$snowflake-notebooks</code></td>
+<td>Workspace notebooks: Snowpark Python + SQL cells</td>
+</tr>
+<tr class="odd">
+<td><code>$deploy-to-spcs</code></td>
+<td>Deploy containers to Snowpark Container Services</td>
+</tr>
+<tr class="even">
+<td><code>$workload-performance-analysis</code></td>
+<td>SQL query performance: spilling, partition pruning</td>
 </tr>
 <tr class="odd">
 <td><code>$lineage</code></td>
@@ -633,6 +763,8 @@ cortex skill add &lt;name&gt;</code></pre>
 </tr>
 </tbody>
 </table>
+<p>Full list (30+): <a href="https://docs.snowflake.com/en/user-guide/cortex-code/bundled-skills">Bundled
+Skills</a></p>
 <h2 id="scheduling">Scheduling</h2>
 <pre class="text"><code>/loop                        # interactive scheduler
 /loop &quot;every day at 9am&quot;     # natural language
@@ -661,9 +793,12 @@ cortex memory recall &quot;warehouse sizing&quot;</code></pre>
 <pre class="text"><code>cortex memory list               # show all memories with IDs
 cortex memory drop &lt;id&gt;          # remove a specific memory by ID</code></pre>
 <blockquote>
-<p>[!TIP] Natural language works too: * Say “remember that we deploy to
-us-east-1” and CoCo stores it. * Say “what’s our commit convention?” and
-CoCo recalls it from memory without a command.</p>
+<p>[!TIP] Natural language works too:</p>
+<ul>
+<li>Say “remember that we deploy to us-east-1” and CoCo stores it.</li>
+<li>Say “what’s our commit convention?” and CoCo recalls it from memory
+without a command.</li>
+</ul>
 </blockquote>
 <h2 id="environment-variables">Environment Variables</h2>
 <table>
@@ -716,6 +851,9 @@ CoCo recalls it from memory without a command.</p>
 </tr>
 </tbody>
 </table>
+<p>Set inline for a single session:</p>
+<pre class="shell"><code># run in terminal
+CORTEX_ENABLE_MEMORY=1 CORTEX_BROWSER_HEADLESS=1 cortex</code></pre>
 <h2 id="settings-worth-knowing">Settings Worth Knowing</h2>
 <p>Configure via <code>/settings</code> or edit
 <code>~/.snowflake/cortex/settings.json</code>.</p>
@@ -736,8 +874,8 @@ CoCo recalls it from memory without a command.</p>
 <tr class="odd">
 <td><code>agentMode</code></td>
 <td><code>standard</code></td>
-<td>Agent behavior profile (<code>standard</code> or
-<code>code</code>)</td>
+<td><code>standard</code> = balanced; <code>code</code> = optimized for
+code-heavy tasks (higher tool call budget)</td>
 </tr>
 <tr class="even">
 <td><code>autoAcceptPlans</code></td>
@@ -779,8 +917,21 @@ CoCo recalls it from memory without a command.</p>
 <td><code>false</code></td>
 <td>Disable <code>/loop</code> scheduling</td>
 </tr>
+<tr class="even">
+<td><code>autoUpdate</code></td>
+<td><code>true</code></td>
+<td><code>false</code> to disable automatic version updates</td>
+</tr>
 </tbody>
 </table>
+<p>Minimal <code>~/.snowflake/cortex/settings.json</code> to start
+from:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;enableMemory&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;autoAcceptPlans&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;autoUpdate&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sqlDefaultTimeoutSeconds&quot;</span><span class="fu">:</span> <span class="dv">300</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h2 id="cli-subcommands">CLI Subcommands</h2>
 <p>Run outside the interactive session — useful in scripts, CI, and
 automation.</p>
@@ -869,6 +1020,9 @@ cortex mcp add
 <code>brave-search</code>, <code>slack</code></p>
 <p>Set <code>mcpWait: true</code> in settings if MCP tools must be ready
 before the first prompt (CI/automation).</p>
+<pre class="shell"><code># run in terminal
+cortex mcp list                     # show configured servers
+cortex mcp remove &lt;server_name&gt;     # remove a server</code></pre>
 <p>For setup details: <a href="https://docs.snowflake.com/en/user-guide/cortex-code/extensibility">MCP
 docs</a></p>
 <h2 id="hooks">Hooks</h2>
@@ -924,6 +1078,12 @@ in <code>~/.snowflake/cortex/hooks/</code>.</p>
 reads the codebase, drafts a plan, and waits for your approval. For
 multi-file changes this is the difference between a clean refactor and a
 mess.</li>
+<li><strong><code>@file</code> does NOT inject content —
+<code>@{file}</code> does.</strong>
+<code>@src/auth.py review this</code> just references the path; CoCo may
+or may not read it. <code>@{src/auth.py} review this</code> injects the
+full contents every time. If CoCo seems to “not know” a file, switch to
+<code>@{</code>.</li>
 <li><strong><code>#TABLE</code> loads schema automatically.</strong>
 Type <code>#</code> then the table name — CoCo fetches column
 definitions before writing any SQL. No need to describe the table.</li>
@@ -952,21 +1112,6 @@ Reference</a></li>
 <li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/extensibility">Extensibility
 (hooks, plugins, MCP)</a></li>
 <li><a href="https://docs.snowflake.com/en/user-guide/cortex-code/changelog">Changelog</a></li>
-</ul>
-<h2 id="further-reading">Further Reading</h2>
-<p>Concepts behind intent-driven development and why tools like CoCo
-change how builders work:</p>
-<ul>
-<li><a href="https://blogs.kameshs.dev/infrastructure-as-intent-the-field-velocity-blueprint-e6217ef30f14">Infrastructure
-as Intent: The Field Velocity Blueprint</a></li>
-<li><a href="https://blogs.kameshs.dev/the-ghost-in-the-machine-why-ai-needs-the-spirit-of-uml-0d8864e583e2">The
-Ghost in the Machine: Why AI Needs the Spirit of UML</a></li>
-<li><a href="https://blogs.kameshs.dev/intent-driven-development-the-shift-developers-cant-ignore-ef434f94d56c">Intent-Driven
-Development: The Shift Developers Can’t Ignore</a></li>
-<li><a href="https://blogs.kameshs.dev/intent-compression-ratio-measuring-the-power-of-intent-ceb6faf2e2f9">Intent
-Compression Ratio: Measuring the Power of Intent</a></li>
-<li><a href="https://blogs.kameshs.dev/icr-and-token-economics-9a014a75b399">ICR
-and Token Economics</a></li>
 </ul>
 </body>
 </html>
