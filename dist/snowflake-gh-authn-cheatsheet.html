@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="dcterms.date" content="2026-06-07" />
+  <title>snowflake-gh-authn-cheatsheet</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } 
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.at { color: #204a87; } 
+code span.bn { color: #0000cf; } 
+code span.cf { color: #204a87; font-weight: bold; } 
+code span.ch { color: #4e9a06; } 
+code span.cn { color: #8f5902; } 
+code span.co { color: #8f5902; font-style: italic; } 
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.dt { color: #204a87; } 
+code span.dv { color: #0000cf; } 
+code span.er { color: #a40000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #0000cf; } 
+code span.fu { color: #204a87; font-weight: bold; } 
+code span.im { } 
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } 
+code span.kw { color: #204a87; font-weight: bold; } 
+code span.op { color: #ce5c00; font-weight: bold; } 
+code span.ot { color: #8f5902; } 
+code span.pp { color: #8f5902; font-style: italic; } 
+code span.sc { color: #ce5c00; font-weight: bold; } 
+code span.ss { color: #4e9a06; } 
+code span.st { color: #4e9a06; } 
+code span.va { color: #000000; } 
+code span.vs { color: #4e9a06; } 
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">snowflake-gh-authn-cheatsheet</h1>
+<p class="date">2026-06-07</p>
+</header>
+<h1 id="snowflake-github-actions-authentication-developer-cheatsheet">Snowflake
++ GitHub Actions Authentication — Developer Cheatsheet</h1>
+<p>Connect GitHub Actions to Snowflake securely: OIDC (secretless,
+recommended) or Key Pair/PAT as fallback for older tooling.</p>
+<blockquote>
+<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/cicd/github-action">Snowflake
+CLI GitHub Action docs</a>.</p>
+</blockquote>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#choose-your-method">Choose Your Method</a></li>
+<li><a href="#oidc-setup-snowflake-side">OIDC Setup: Snowflake
+Side</a></li>
+<li><a href="#oidc-setup-github-actions">OIDC Setup: GitHub
+Actions</a></li>
+<li><a href="#oidc-subject-patterns">OIDC Subject Patterns</a></li>
+<li><a href="#network-policy">Network Policy</a></li>
+<li><a href="#key-pair-auth">Key Pair Auth</a></li>
+<li><a href="#pat--password-legacy">PAT / Password (Legacy)</a></li>
+<li><a href="#env-vars-reference">Env Vars Reference</a></li>
+<li><a href="#cleanup">Cleanup</a></li>
+<li><a href="#tips--gotchas">Tips &amp; Gotchas</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="choose-your-method">Choose Your Method</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>GitHub Secrets needed</th>
+<th>Credential rotation</th>
+<th>Snow CLI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>OIDC (recommended)</strong></td>
+<td><code>SNOWFLAKE_ACCOUNT</code> only</td>
+<td>None — tokens short-lived per run</td>
+<td>≥ 3.11</td>
+</tr>
+<tr class="even">
+<td><strong>Key pair</strong></td>
+<td>Account + user + private key</td>
+<td>Yes — rotate private key</td>
+<td>Any</td>
+</tr>
+<tr class="odd">
+<td><strong>PAT / Password</strong></td>
+<td>Account + user + password/PAT</td>
+<td>Yes — manual rotation</td>
+<td>Any</td>
+</tr>
+</tbody>
+</table>
+<p>Check your installed version:</p>
+<pre class="shell"><code># run in terminal
+snow --version   # must be ≥ 3.11 for OIDC; upgrade: pip install -U snowflake-cli</code></pre>
+<blockquote>
+<p>[!TIP] OIDC is the only method that stores zero long-lived secrets in
+GitHub. Use it whenever Snow CLI ≥ 3.11 is available.</p>
+</blockquote>
+<h2 id="oidc-setup-snowflake-side">OIDC Setup: Snowflake Side</h2>
+<p>Run as <code>ACCOUNTADMIN</code>. Creates a service user that trusts
+GitHub’s OIDC tokens directly — no password, no key pair stored
+anywhere.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> <span class="kw">ROLE</span> ACCOUNTADMIN;</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- 1. Least-privilege role for the workflow</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">ROLE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> gh_actions_role</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">COMMENT</span> <span class="op">=</span> <span class="st">&#39;Least-privilege role for GitHub Actions via OIDC&#39;</span>;</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE my_wh <span class="kw">TO</span> <span class="kw">ROLE</span> gh_actions_role;</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">-- Add further grants only as required by the workflow</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">-- 2. Service user mapped to GitHub OIDC</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="fu">USER</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> gh_actions_svc_user</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">TYPE</span>    <span class="op">=</span> SERVICE</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  WORKLOAD_IDENTITY <span class="op">=</span> (</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">TYPE</span>    <span class="op">=</span> OIDC</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    ISSUER  <span class="op">=</span> <span class="st">&#39;https://token.actions.githubusercontent.com&#39;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    SUBJECT <span class="op">=</span> <span class="st">&#39;repo:&lt;owner&gt;/&lt;repo&gt;:environment:&lt;env-name&gt;&#39;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  DEFAULT_ROLE      <span class="op">=</span> gh_actions_role</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  DEFAULT_WAREHOUSE <span class="op">=</span> my_wh</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">COMMENT</span>           <span class="op">=</span> <span class="st">&#39;GitHub Actions OIDC service user&#39;</span>;</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">ROLE</span> gh_actions_role <span class="kw">TO</span> <span class="fu">USER</span> gh_actions_svc_user;</span></code></pre></div>
+<p>Verify the user and workload identity were created correctly:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>DESCRIBE <span class="fu">USER</span> gh_actions_svc_user;</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">PARAMETERS</span> <span class="kw">LIKE</span> <span class="st">&#39;DEFAULT_ROLE&#39;</span> <span class="cf">FOR</span> <span class="fu">USER</span> gh_actions_svc_user;</span></code></pre></div>
+<p>Replace
+<code>&lt;owner&gt;/&lt;repo&gt;:environment:&lt;env-name&gt;</code>
+with your values — see <a href="#oidc-subject-patterns">OIDC Subject
+Patterns</a>.</p>
+<h2 id="oidc-setup-github-actions">OIDC Setup: GitHub Actions</h2>
+<p>Two requirements: <code>permissions: id-token: write</code> on the
+job and <code>use-oidc: true</code> on the action. Only one GitHub
+Secret is needed: <code>SNOWFLAKE_ACCOUNT</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy to Snowflake</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">main</span><span class="kw">]</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">id-token</span><span class="kw">:</span><span class="at"> write</span><span class="co">   # required for OIDC token issuance</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> read</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">deploy</span><span class="kw">:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">environment</span><span class="kw">:</span><span class="at"> prod</span><span class="co">         # must match the SUBJECT in CREATE USER</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">persist-credentials</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> snowflakedb/snowflake-cli-action@v2</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">use-oidc</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">cli-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3.16&quot;</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Test connection</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">SNOWFLAKE_ACCOUNT</span><span class="kw">:</span><span class="at"> ${{ secrets.SNOWFLAKE_ACCOUNT }}</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> snow connection test -x</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run governance SQL</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">SNOWFLAKE_ACCOUNT</span><span class="kw">:</span><span class="at"> ${{ secrets.SNOWFLAKE_ACCOUNT }}</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> snow sql -x -f governance/policy.sql</span></span></code></pre></div>
+<p><code>-x</code> (<code>--temporary-connection</code>) builds the
+connection from env vars — no <code>config.toml</code> required on the
+runner.</p>
+<p>Set the one required GitHub Secret:</p>
+<pre class="shell"><code># run in terminal
+gh secret set SNOWFLAKE_ACCOUNT --body &quot;orgname-accountname&quot;</code></pre>
+<h2 id="oidc-subject-patterns">OIDC Subject Patterns</h2>
+<p>The <code>SUBJECT</code> in <code>CREATE USER</code> must match the
+claim GitHub emits for the job exactly.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subject format</th>
+<th>Matches</th>
+<th>Job requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>repo:&lt;owner&gt;/&lt;repo&gt;:environment:&lt;name&gt;</code></td>
+<td>Job targets a named environment</td>
+<td><code>environment: &lt;name&gt;</code> set on the job
+<strong>(recommended)</strong></td>
+</tr>
+<tr class="even">
+<td><code>repo:&lt;owner&gt;/&lt;repo&gt;:ref:refs/heads/&lt;branch&gt;</code></td>
+<td>Push to the specified branch</td>
+<td><code>on: push</code>, no <code>environment:</code> on job</td>
+</tr>
+<tr class="odd">
+<td><code>repo:&lt;owner&gt;/&lt;repo&gt;:pull_request</code></td>
+<td>Any pull request event</td>
+<td><code>on: pull_request</code>, no <code>environment:</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[!NOTE] When a job sets <code>environment:</code>, GitHub always uses
+the environment-based subject regardless of trigger. Use
+<code>environment:</code> subjects for tighter scoping — one OIDC user
+per environment (e.g. <code>dev</code>, <code>prod</code>).</p>
+</blockquote>
+<h2 id="network-policy">Network Policy</h2>
+<p>Only needed if your Snowflake account restricts inbound IPs. Use the
+Snowflake-managed rule — no manual CIDR list maintenance required.</p>
+<p>Check whether the service user already has a network policy:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SHOW <span class="kw">PARAMETERS</span> <span class="kw">LIKE</span> <span class="st">&#39;NETWORK_POLICY&#39;</span> <span class="cf">FOR</span> <span class="fu">USER</span> gh_actions_svc_user;</span></code></pre></div>
+<p>Create and apply a new policy with the managed GitHub Actions
+rule:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">NETWORK</span> POLICY gh_actions_policy</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  ALLOWED_NETWORK_RULE_LIST <span class="op">=</span> (<span class="st">&#39;SNOWFLAKE.NETWORK_SECURITY.GITHUBACTIONS_GLOBAL&#39;</span>);</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> gh_actions_svc_user</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SET</span> NETWORK_POLICY <span class="op">=</span> gh_actions_policy;</span></code></pre></div>
+<p>Add to an existing policy instead of replacing it:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">NETWORK</span> POLICY existing_policy</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ADD</span> ALLOWED_NETWORK_RULE_LIST <span class="op">=</span> (<span class="st">&#39;SNOWFLAKE.NETWORK_SECURITY.GITHUBACTIONS_GLOBAL&#39;</span>);</span></code></pre></div>
+<blockquote>
+<p>[!NOTE] If you see
+<code>Incoming request with IP is not allowed to access Snowflake</code>
+— add the network policy. If the account has no IP restrictions, skip
+this section.</p>
+</blockquote>
+<h2 id="key-pair-auth">Key Pair Auth</h2>
+<p>Use when Snow CLI &lt; 3.11 or OIDC is not available. GitHub Secrets
+needed: <code>SNOWFLAKE_ACCOUNT</code>, <code>SNOWFLAKE_USER</code>,
+<code>SNOWFLAKE_PRIVATE_KEY_RAW</code>.</p>
+<p>Generate a key pair:</p>
+<pre class="shell"><code># run in terminal
+openssl genrsa 2048 | openssl pkcs8 -topk8 -nocrypt -out private_key.p8
+openssl rsa -in private_key.p8 -pubout -out public_key.pub</code></pre>
+<p>Register the public key on the Snowflake user:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> my_user <span class="kw">SET</span> RSA_PUBLIC_KEY <span class="op">=</span> <span class="st">&#39;&lt;public_key.pub contents, no header/footer&gt;&#39;</span>;</span></code></pre></div>
+<p>Store all three required GitHub Secrets:</p>
+<pre class="shell"><code># run in terminal
+gh secret set SNOWFLAKE_ACCOUNT        --body &quot;orgname-accountname&quot;
+gh secret set SNOWFLAKE_USER           --body &quot;my_user&quot;
+gh secret set SNOWFLAKE_PRIVATE_KEY_RAW &lt; private_key.p8</code></pre>
+<p><strong>Temporary connection</strong> (no <code>config.toml</code> —
+recommended for CI):</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> snowflakedb/snowflake-cli-action@v2</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cli-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3.16&quot;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_AUTHENTICATOR</span><span class="kw">:</span><span class="at">    SNOWFLAKE_JWT</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_ACCOUNT</span><span class="kw">:</span><span class="at">          ${{ secrets.SNOWFLAKE_ACCOUNT }}</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_USER</span><span class="kw">:</span><span class="at">             ${{ secrets.SNOWFLAKE_USER }}</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_PRIVATE_KEY_RAW</span><span class="kw">:</span><span class="at">  ${{ secrets.SNOWFLAKE_PRIVATE_KEY_RAW }}</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> snow connection test -x</span></span></code></pre></div>
+<p><strong>Named connection</strong> (commit a minimal
+<code>config.toml</code>, override via env vars):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># config.toml — commit this, contains no secrets</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">default_connection_name</span> <span class="op">=</span> <span class="st">&quot;ci&quot;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">[connections.ci]</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> snowflakedb/snowflake-cli-action@v2</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cli-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3.16&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">default-config-file-path</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;config.toml&quot;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_CONNECTIONS_CI_AUTHENTICATOR</span><span class="kw">:</span><span class="at">   SNOWFLAKE_JWT</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_CONNECTIONS_CI_ACCOUNT</span><span class="kw">:</span><span class="at">         ${{ secrets.SNOWFLAKE_ACCOUNT }}</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_CONNECTIONS_CI_USER</span><span class="kw">:</span><span class="at">            ${{ secrets.SNOWFLAKE_USER }}</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_CONNECTIONS_CI_PRIVATE_KEY_RAW</span><span class="kw">:</span><span class="at"> ${{ secrets.SNOWFLAKE_PRIVATE_KEY_RAW }}</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> snow connection test</span></span></code></pre></div>
+<h2 id="pat-password-legacy">PAT / Password (Legacy)</h2>
+<p>Use only for legacy tooling that cannot use OIDC or key pairs. GitHub
+Secrets needed: <code>SNOWFLAKE_ACCOUNT</code>,
+<code>SNOWFLAKE_USER</code>, <code>SNOWFLAKE_PASSWORD</code> (or
+PAT).</p>
+<p>Generate a PAT in Snowsight (Profile → Programmatic Access Tokens →
+Generate) or via SQL:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> my_user <span class="kw">ADD</span> PROGRAMMATIC <span class="kw">ACCESS</span> TOKEN my_ci_token</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  ROLE_RESTRICTION <span class="op">=</span> my_ci_role;</span></code></pre></div>
+<p>GitHub Actions workflow:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> snowflakedb/snowflake-cli-action@v2</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cli-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;3.16&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run SQL</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_ACCOUNT</span><span class="kw">:</span><span class="at">  ${{ secrets.SNOWFLAKE_ACCOUNT }}</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_USER</span><span class="kw">:</span><span class="at">     ${{ secrets.SNOWFLAKE_USER }}</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">SNOWFLAKE_PASSWORD</span><span class="kw">:</span><span class="at"> ${{ secrets.SNOWFLAKE_PASSWORD }}</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> snow connection test -x</span></span></code></pre></div>
+<p>Remove a PAT when no longer needed:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="fu">USER</span> my_user REMOVE PROGRAMMATIC <span class="kw">ACCESS</span> TOKEN my_ci_token;</span></code></pre></div>
+<h2 id="env-vars-reference">Env Vars Reference</h2>
+<p>Variables set automatically by <code>snowflake-cli-action@v2</code>
+when <code>use-oidc: true</code>. You only need to provide
+<code>SNOWFLAKE_ACCOUNT</code> — everything else is injected by the
+action.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Value set by action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SNOWFLAKE_AUTHENTICATOR</code></td>
+<td><code>WORKLOAD_IDENTITY</code></td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_WORKLOAD_IDENTITY_PROVIDER</code></td>
+<td><code>OIDC</code></td>
+</tr>
+<tr class="odd">
+<td><code>SNOWFLAKE_AUDIENCE</code></td>
+<td><code>snowflakecomputing.com</code></td>
+</tr>
+<tr class="even">
+<td><code>SNOWFLAKE_TOKEN</code></td>
+<td>GitHub OIDC token (short-lived, per run)</td>
+</tr>
+</tbody>
+</table>
+<p>Override the token variable for named connections:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> snowflakedb/snowflake-cli-action@v2</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">use-oidc</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">oidc-token-name</span><span class="kw">:</span><span class="at"> SNOWFLAKE_CONNECTIONS_PROD_TOKEN</span></span></code></pre></div>
+<p>Use
+<code>oidc-token-name: SNOWFLAKE_CONNECTIONS_&lt;NAME&gt;_TOKEN</code>
+where <code>&lt;NAME&gt;</code> is the uppercased connection name from
+<code>config.toml</code> (e.g. <code>[connections.prod]</code> →
+<code>PROD</code>).</p>
+<h2 id="cleanup">Cleanup</h2>
+<p>Remove OIDC objects when decommissioning a workflow:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">USE</span> <span class="kw">ROLE</span> ACCOUNTADMIN;</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="fu">USER</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> gh_actions_svc_user;</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">ROLE</span> <span class="cf">IF</span> <span class="kw">EXISTS</span> gh_actions_role;</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">DROP</span> <span class="kw">NETWORK</span> POLICY <span class="cf">IF</span> <span class="kw">EXISTS</span> gh_actions_policy;</span></code></pre></div>
+<p>Remove GitHub Secrets via CLI:</p>
+<pre class="shell"><code># run in terminal
+gh secret delete SNOWFLAKE_ACCOUNT
+gh secret delete SNOWFLAKE_USER             # key pair / PAT only
+gh secret delete SNOWFLAKE_PRIVATE_KEY_RAW  # key pair only
+gh secret delete SNOWFLAKE_PASSWORD         # PAT / password only</code></pre>
+<h2 id="tips-gotchas">Tips &amp; Gotchas</h2>
+<ul>
+<li><strong>Subject must match exactly.</strong> A mismatch between
+<code>SUBJECT</code> in <code>CREATE USER</code> and the claim GitHub
+emits silently fails auth with a generic error. Test with
+<code>snow connection test -x</code> in a throwaway workflow run before
+building the full pipeline.</li>
+<li><strong><code>environment:</code> overrides all other subject
+formats.</strong> Once a job sets <code>environment:</code>, GitHub
+always uses the environment claim regardless of trigger (push, PR,
+schedule). Plan one OIDC service user per environment (<code>dev</code>,
+<code>staging</code>, <code>prod</code>), not per branch.</li>
+<li><strong><code>-x</code> is required in CI.</strong> Without
+<code>--temporary-connection</code>, Snow CLI looks for
+<code>~/.snowflake/config.toml</code> which does not exist on a fresh
+GitHub Actions runner.</li>
+<li><strong>Network policy is evaluated before OIDC token
+validation.</strong> An IP-blocked runner shows
+<code>IP not allowed</code> — not an auth error. Add
+<code>SNOWFLAKE.NETWORK_SECURITY.GITHUBACTIONS_GLOBAL</code> first, then
+debug the OIDC subject.</li>
+<li><strong>PATs expire silently.</strong> A workflow using an expired
+PAT fails without a clear error until someone investigates. Set a
+calendar reminder before <code>DEFAULT_EXPIRY_IN_DAYS</code>. OIDC
+tokens are always fresh — one more reason to prefer OIDC.</li>
+</ul>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/cicd/github-action">Snowflake
+CLI GitHub Action</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/cicd/integrate-ci-cd">Integrating
+CI/CD with Snowflake CLI</a></li>
+<li><a href="https://docs.snowflake.com/en/developer-guide/snowflake-cli/command-reference/auth-commands/overview">snow
+auth oidc commands</a></li>
+<li><a href="https://docs.snowflake.com/en/user-guide/programmatic-access-tokens">Snowflake
+Programmatic Access Tokens</a></li>
+<li><a href="https://docs.snowflake.com/en/sql-reference/sql/create-network-rule">Snowflake
+Network Rules</a></li>
+</ul>
+</body>
+</html>
