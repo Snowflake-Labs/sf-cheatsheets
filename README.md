@@ -36,21 +36,6 @@ The mistake is using an agent as a faster cheatsheet. Agents win on reasoning ov
 context* — debug this error, explain why this query is slow, generate this pipeline from a description.
 That is not what a cheatsheet is for.
 
-## Contributing
-
-If you want to add a cheatsheet for your area, there is a Cortex Code skill that does the research,
-drafts the content, runs the quality gate, and opens the PR:
-
-```
-$create-cheatsheet
-```
-
-The skill walks you through scope → draft → style/lint → developer value scorecard → PR in a single
-session. The output is a 300–450 line markdown file that passes a 6-dimension quality rubric before
-it ships. Conventional commit prefix for cheatsheets is `docs:`.
-
-If you find an error or a gap in an existing cheatsheet, file an issue or open a PR directly.
-
 ## Issues
 
 File all issues at <https://github.com/Snowflake-Labs/sf-cheatsheets/issues>
