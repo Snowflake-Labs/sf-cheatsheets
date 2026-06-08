@@ -17,13 +17,13 @@ peripheral vision.
 | [Warehouses](warehouses-cheatsheet.md) | Warehouse sizing, auto-suspend, multi-cluster, resource monitors, cost controls |
 | [Iceberg](iceberg-cheatsheet.md) | Iceberg table creation, catalog integration, storage options, time travel |
 | [Snowflake Postgres](snowflake-postgres-cheatsheet.md) | Snowflake Postgres instances, pg_lake, CLD setup, managed storage |
-| [GitHub Authentication](snowflake-gh-authn-cheatsheet.md) | PAT-based auth, GitHub Actions integration, connection strings |
+| [GitHub Authentication](snowflake-gh-authn-cheatsheet.md) | OIDC-first auth, GitHub Actions integration, PAT fallback |
 | [RAG Evaluation](rag-evaluation-cheatsheet.md) | RAGAS metrics, Cortex evaluation functions, evaluation dataset setup |
 | [Cortex Code](cortex-code-cheatsheet.md) | Cortex Code CLI commands, sessions, skills, context management |
 
 ## Why a cheatsheet, not just asking an agent?
 
-> A cheatsheet is the answer you already verified, formatted to fit in your peripheral vision.
+> A cheatsheet is the answer you already verified, ready the moment you need it.
 > An AI agent is the answer you hope is right, arriving after a round-trip.
 
 Agents re-generate every time. That means hallucination risk (confidently wrong flags, deprecated
