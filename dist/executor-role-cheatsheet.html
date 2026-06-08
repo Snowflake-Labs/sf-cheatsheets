@@ -241,13 +241,14 @@ Role — Developer Cheatsheet</h1>
 <p>The role Snowflake uses to check privileges at runtime: not who calls
 the object, but whose grants apply when it executes.</p>
 <blockquote>
-<p>[!IMPORTANT] Community cheatsheet — not official Snowflake
+<p>[!IMPORTANT] Community cheatsheet. Not official Snowflake
 documentation. For the authoritative reference, see <a href="https://docs.snowflake.com/en/guides-overview-secure">Snowflake
 Security docs</a>.</p>
 </blockquote>
 <h2 id="table-of-contents">Table of Contents</h2>
 <ul>
 <li><a href="#the-executor-role-model">The Executor Role Model</a></li>
+<li><a href="#start-here">Start Here</a></li>
 <li><a href="#per-object-quick-reference">Per-Object Quick
 Reference</a></li>
 <li><a href="#stored-procedures">Stored Procedures</a></li>
@@ -293,6 +294,48 @@ necessarily the role of the person who triggered execution.</p>
 </table>
 <p>These return the same value at the top-level session. They diverge
 inside objects.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- At session level: both functions return the same role</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> CURRENT_ROLE(), INVOKER_ROLE();</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">-- Inside an owner&#39;s rights procedure: they diverge</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- CURRENT_ROLE() = the caller&#39;s session role</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- INVOKER_ROLE() = the procedure owner&#39;s role</span></span></code></pre></div>
+<h2 id="start-here">Start Here</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>If you have…</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A stored proc failing with insufficient privileges</td>
+<td><a href="#stored-procedures">Stored Procedures</a> + <a href="#decision-matrix">Decision Matrix</a></td>
+</tr>
+<tr class="even">
+<td>A task that won’t resume or stays suspended</td>
+<td><a href="#tasks">Tasks</a></td>
+</tr>
+<tr class="odd">
+<td>A dynamic table refresh failing after ownership transfer</td>
+<td><a href="#dynamic-tables">Dynamic Tables</a></td>
+</tr>
+<tr class="even">
+<td>A masking policy returning the wrong role</td>
+<td><a href="#masking-and-row-access-policies">Masking and Row Access
+Policies</a></td>
+</tr>
+<tr class="odd">
+<td>An error message you don’t recognize</td>
+<td><a href="#troubleshooting">Troubleshooting</a></td>
+</tr>
+</tbody>
+</table>
 <h2 id="per-object-quick-reference">Per-Object Quick Reference</h2>
 <table>
 <colgroup>
@@ -373,37 +416,37 @@ policies or audit trails require a real user.</p>
 <p>The <code>EXECUTE AS</code> clause sets the execution context at
 creation time. Default is owner’s rights.</p>
 <p>Owner’s rights: runs with the procedure owner’s privileges:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> myschema.clean_old_orders()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  RETURNS <span class="dt">VARCHAR</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  LANGUAGE SQL</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> OWNER</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">DELETE</span> <span class="kw">FROM</span> orders <span class="kw">WHERE</span> created_at <span class="op">&lt;</span> DATEADD(<span class="dt">year</span>, <span class="op">-</span><span class="dv">7</span>, <span class="fu">CURRENT_DATE</span>());</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="st">&#39;done&#39;</span>;</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
-<p>Caller’s rights: runs with the caller’s current role:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> myschema.get_my_orders(region <span class="dt">VARCHAR</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  RETURNS <span class="kw">TABLE</span> (order_id <span class="dt">NUMBER</span>, status <span class="dt">VARCHAR</span>)</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> myschema.clean_old_orders()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  RETURNS <span class="dt">VARCHAR</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  LANGUAGE SQL</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> CALLER</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> OWNER</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="kw">TABLE</span>(<span class="kw">SELECT</span> order_id, status <span class="kw">FROM</span> orders <span class="kw">WHERE</span> o_region <span class="op">=</span> <span class="ch">:region</span>);</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
-<p>Restricted caller’s rights (Native Apps only):</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> CORE.PROCESS_CONSUMER_DATA()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  RETURNS STRING</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">DELETE</span> <span class="kw">FROM</span> orders <span class="kw">WHERE</span> created_at <span class="op">&lt;</span> DATEADD(<span class="dt">year</span>, <span class="op">-</span><span class="dv">7</span>, <span class="fu">CURRENT_DATE</span>());</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="st">&#39;done&#39;</span>;</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<p>Caller’s rights: runs with the caller’s current role:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> myschema.get_my_orders(region <span class="dt">VARCHAR</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  RETURNS <span class="kw">TABLE</span> (order_id <span class="dt">NUMBER</span>, status <span class="dt">VARCHAR</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  LANGUAGE SQL</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="kw">RESTRICTED</span> CALLER</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> CALLER</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="st">&#39;processed&#39;</span>;</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="kw">TABLE</span>(<span class="kw">SELECT</span> order_id, status <span class="kw">FROM</span> orders <span class="kw">WHERE</span> o_region <span class="op">=</span> <span class="ch">:region</span>);</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<p>Restricted caller’s rights (Native Apps only):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">PROCEDURE</span> CORE.PROCESS_CONSUMER_DATA()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  RETURNS STRING</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  LANGUAGE SQL</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="kw">RESTRICTED</span> CALLER</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">BEGIN</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">RETURN</span> <span class="st">&#39;processed&#39;</span>;</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
 <p>Grant a caller grant to a Native App (run in consumer account):</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> CALLER <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">DATABASE</span> consumer_db <span class="kw">TO</span> APPLICATION my_app;</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> CALLER <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">DATABASE</span> consumer_db <span class="kw">TO</span> APPLICATION my_app;</span></code></pre></div>
 <p>Change execution rights on an existing procedure:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">PROCEDURE</span> myschema.clean_old_orders() <span class="kw">EXECUTE</span> <span class="kw">AS</span> CALLER;</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">PROCEDURE</span> myschema.clean_old_orders() <span class="kw">EXECUTE</span> <span class="kw">AS</span> CALLER;</span></code></pre></div>
 <p>Key behavioral differences:</p>
 <table>
 <colgroup>
@@ -456,11 +499,11 @@ even those individually set to <code>EXECUTE AS CALLER</code>.</p>
 account-level and must be granted separately. OWNERSHIP alone does not
 allow a task to run.</p>
 <p>Minimum privilege set for a role to own and execute a task:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">EXECUTE</span> TASK <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OWNERSHIP <span class="kw">ON</span> TASK mydb.myschema.my_task <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE task_wh <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">EXECUTE</span> TASK <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OWNERSHIP <span class="kw">ON</span> TASK mydb.myschema.my_task <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE task_wh <span class="kw">TO</span> <span class="kw">ROLE</span> task_runner_role;</span></code></pre></div>
 <p>Resume a task (requires both OWNERSHIP and EXECUTE TASK):</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> TASK mydb.myschema.my_task <span class="kw">RESUME</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> TASK mydb.myschema.my_task <span class="kw">RESUME</span>;</span></code></pre></div>
 <blockquote>
 <p>[!TIP] <code>EXECUTE TASK</code> is granted at the account level, not
 the object level. Creating a task does not imply it. A role can own a
@@ -472,34 +515,34 @@ retain SELECT on all source objects and USAGE on the warehouse at all
 times, not just at creation.</p>
 <p>Create a dynamic table (owner role needs SELECT on sources + USAGE on
 warehouse):</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> order_id, customer_key, total_price</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS;</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> order_id, customer_key, total_price</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS;</span></code></pre></div>
 <p>Use <code>EXECUTE AS USER</code> when masking policies or audit
 attribution require a named user:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> IMPERSONATE <span class="kw">ON</span> <span class="fu">USER</span> svc_transform <span class="kw">TO</span> <span class="kw">ROLE</span> transform_role;</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">ROLE</span> transform_role <span class="kw">TO</span> <span class="fu">USER</span> svc_transform;</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span> svc_transform</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> order_id, customer_key, total_price</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS;</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> IMPERSONATE <span class="kw">ON</span> <span class="fu">USER</span> svc_transform <span class="kw">TO</span> <span class="kw">ROLE</span> transform_role;</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">ROLE</span> transform_role <span class="kw">TO</span> <span class="fu">USER</span> svc_transform;</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span> svc_transform</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> order_id, customer_key, total_price</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> SNOWFLAKE_SAMPLE_DATA.TPCH_SF1.ORDERS;</span></code></pre></div>
 <p>Activate secondary roles during refresh:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span> svc_transform</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">USE</span> SECONDARY <span class="kw">ROLES</span> <span class="kw">ALL</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.;</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  TARGET_LAG <span class="op">=</span> <span class="st">&#39;10 minutes&#39;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  WAREHOUSE <span class="op">=</span> transform_wh</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span> svc_transform</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">USE</span> SECONDARY <span class="kw">ROLES</span> <span class="kw">ALL</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">AS</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.;</span></code></pre></div>
 <p>Revert to the default SYSTEM user:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders UNSET <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">ALTER</span> <span class="kw">DYNAMIC</span> <span class="kw">TABLE</span> mydb.myschema.dt_orders UNSET <span class="kw">EXECUTE</span> <span class="kw">AS</span> <span class="fu">USER</span>;</span></code></pre></div>
 <blockquote>
 <p>[!IMPORTANT] If the owner role loses SELECT on any source table or
 USAGE on the warehouse after creation, scheduled refreshes fail and the
@@ -510,7 +553,7 @@ the new owner role holds all required privileges.</p>
 <p>UDFs always execute in the owner’s context. This is not
 configurable.</p>
 <p>Grant a role the right to call a UDF:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">FUNCTION</span> mydb.myschema.mask_ssn(<span class="dt">VARCHAR</span>) <span class="kw">TO</span> <span class="kw">ROLE</span> analyst_role;</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">FUNCTION</span> mydb.myschema.mask_ssn(<span class="dt">VARCHAR</span>) <span class="kw">TO</span> <span class="kw">ROLE</span> analyst_role;</span></code></pre></div>
 <blockquote>
 <p>[!NOTE] Since BCR 2023_03: handler code that reads files from a stage
 executes in the owner’s context. Callers must pass file locations via
@@ -521,17 +564,17 @@ from owner-context UDFs or stored procedures.</p>
 <p>Alerts run as the alert owner role. Like tasks, OWNERSHIP alone does
 not allow an alert to fire.</p>
 <p>Minimum privilege set:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">EXECUTE</span> ALERT <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OWNERSHIP <span class="kw">ON</span> ALERT mydb.myschema.my_alert <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE monitor_wh <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">EXECUTE</span> ALERT <span class="kw">ON</span> <span class="kw">ACCOUNT</span> <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> OWNERSHIP <span class="kw">ON</span> ALERT mydb.myschema.my_alert <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> WAREHOUSE monitor_wh <span class="kw">TO</span> <span class="kw">ROLE</span> alert_owner_role;</span></code></pre></div>
 <h2 id="streamlit-apps">Streamlit Apps</h2>
 <p>Streamlit apps run with owner’s rights. The app owner role must hold
 privileges on any Snowflake objects the app queries, not the viewer’s
 role.</p>
 <p>Grant data access to the Streamlit owner role:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">DATABASE</span> analytics_db <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">SCHEMA</span> analytics_db.<span class="kw">public</span> <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">SELECT</span> <span class="kw">ON</span> <span class="kw">TABLE</span> analytics_db.<span class="kw">public</span>.orders <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">DATABASE</span> analytics_db <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">USAGE</span> <span class="kw">ON</span> <span class="kw">SCHEMA</span> analytics_db.<span class="kw">public</span> <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GRANT</span> <span class="kw">SELECT</span> <span class="kw">ON</span> <span class="kw">TABLE</span> analytics_db.<span class="kw">public</span>.orders <span class="kw">TO</span> <span class="kw">ROLE</span> streamlit_owner_role;</span></code></pre></div>
 <blockquote>
 <p>[!TIP] A user with <code>VIEWER</code> on your app can see any data
 the owner role can access, even if the viewer has no direct grants on
@@ -585,29 +628,29 @@ object:</p>
 </table>
 <p>Use <code>INVOKER_ROLE()</code> when the policy enforces based on the
 executing object’s owner:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_total <span class="kw">AS</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>(val <span class="dt">NUMBER</span>) RETURNS <span class="dt">NUMBER</span> <span class="op">-&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> INVOKER_ROLE() <span class="kw">IN</span> (<span class="st">&#39;FINANCE_ROLE&#39;</span>) <span class="cf">THEN</span> val</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="op">-</span><span class="dv">1</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_total <span class="kw">AS</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(val <span class="dt">NUMBER</span>) RETURNS <span class="dt">NUMBER</span> <span class="op">-&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> INVOKER_ROLE() <span class="kw">IN</span> (<span class="st">&#39;FINANCE_ROLE&#39;</span>) <span class="cf">THEN</span> val</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="op">-</span><span class="dv">1</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
 <p>Use <code>IS_GRANTED_TO_INVOKER_ROLE()</code> to check role hierarchy
 (not just exact match):</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_ssn <span class="kw">AS</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>(val <span class="dt">VARCHAR</span>) RETURNS <span class="dt">VARCHAR</span> <span class="op">-&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> IS_GRANTED_TO_INVOKER_ROLE(<span class="st">&#39;PAYROLL&#39;</span>) <span class="cf">THEN</span> val</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> IS_GRANTED_TO_INVOKER_ROLE(<span class="st">&#39;ANALYST&#39;</span>) <span class="cf">THEN</span> <span class="fu">REGEXP_REPLACE</span>(val, <span class="st">&#39;[0-9]&#39;</span>, <span class="st">&#39;*&#39;</span>, <span class="dv">7</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="st">&#39;*******&#39;</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
-<p>Use <code>CURRENT_ROLE()</code> when the policy enforces based on the
-session role:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_by_session <span class="kw">AS</span></span>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_ssn <span class="kw">AS</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>(val <span class="dt">VARCHAR</span>) RETURNS <span class="dt">VARCHAR</span> <span class="op">-&gt;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> CURRENT_ROLE() <span class="kw">IN</span> (<span class="st">&#39;ANALYST&#39;</span>) <span class="cf">THEN</span> val</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="st">&#39;********&#39;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> IS_GRANTED_TO_INVOKER_ROLE(<span class="st">&#39;PAYROLL&#39;</span>) <span class="cf">THEN</span> val</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> IS_GRANTED_TO_INVOKER_ROLE(<span class="st">&#39;ANALYST&#39;</span>) <span class="cf">THEN</span> <span class="fu">REGEXP_REPLACE</span>(val, <span class="st">&#39;[0-9]&#39;</span>, <span class="st">&#39;*&#39;</span>, <span class="dv">7</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="st">&#39;*******&#39;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
+<p>Use <code>CURRENT_ROLE()</code> when the policy enforces based on the
+session role:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">OR</span> <span class="kw">REPLACE</span> MASKING POLICY mask_by_session <span class="kw">AS</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>(val <span class="dt">VARCHAR</span>) RETURNS <span class="dt">VARCHAR</span> <span class="op">-&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> CURRENT_ROLE() <span class="kw">IN</span> (<span class="st">&#39;ANALYST&#39;</span>) <span class="cf">THEN</span> val</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> <span class="st">&#39;********&#39;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="cf">END</span>;</span></code></pre></div>
 <h2 id="decision-matrix">Decision Matrix</h2>
 <table>
 <colgroup>
