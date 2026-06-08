@@ -12,13 +12,14 @@ The role Snowflake uses to check privileges at runtime: not who calls the object
 but whose grants apply when it executes.
 
 > [!IMPORTANT]
-> Community cheatsheet — not official Snowflake documentation.
+> Community cheatsheet. Not official Snowflake documentation.
 > For the authoritative reference, see
 > [Snowflake Security docs](https://docs.snowflake.com/en/guides-overview-secure).
 
 ## Table of Contents
 
 - [The Executor Role Model](#the-executor-role-model)
+- [Start Here](#start-here)
 - [Per-Object Quick Reference](#per-object-quick-reference)
 - [Stored Procedures](#stored-procedures)
 - [Tasks](#tasks)
@@ -46,6 +47,25 @@ Two context functions expose this at query time:
 | `INVOKER_ROLE()` | The role Snowflake uses for the currently executing object |
 
 These return the same value at the top-level session. They diverge inside objects.
+
+```sql
+-- At session level: both functions return the same role
+SELECT CURRENT_ROLE(), INVOKER_ROLE();
+
+-- Inside an owner's rights procedure: they diverge
+-- CURRENT_ROLE() = the caller's session role
+-- INVOKER_ROLE() = the procedure owner's role
+```
+
+## Start Here
+
+| If you have... | Go to |
+| --- | --- |
+| A stored proc failing with insufficient privileges | [Stored Procedures](#stored-procedures) + [Decision Matrix](#decision-matrix) |
+| A task that won't resume or stays suspended | [Tasks](#tasks) |
+| A dynamic table refresh failing after ownership transfer | [Dynamic Tables](#dynamic-tables) |
+| A masking policy returning the wrong role | [Masking and Row Access Policies](#masking-and-row-access-policies) |
+| An error message you don't recognize | [Troubleshooting](#troubleshooting) |
 
 ## Per-Object Quick Reference
 
