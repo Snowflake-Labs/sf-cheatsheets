@@ -727,6 +727,55 @@ non-owners. This is intentional. Use it for IP protection.</li>
 single owner’s rights proc anywhere in a nested call hierarchy converts
 all downstream procs to owner’s rights, regardless of their individual
 <code>EXECUTE AS</code> settings.</li>
+<li><strong><code>IDENTIFIER()</code> only accepts simple session
+variable references, not expressions.</strong>
+<code>IDENTIFIER($var || &#39;_suffix&#39;)</code> fails everywhere in DDL/DML.
+Pre-declare all composed names:
+<code>SET R_NAME = $PREFIX || &#39;_suffix&#39;; GRANT ... TO ROLE IDENTIFIER($R_NAME);</code></li>
+<li><strong><code>USE ROLE IDENTIFIER(...)</code> is not valid
+syntax.</strong> Use EXECUTE IMMEDIATE:
+<code>SET r = &#39;USE ROLE &#39; || $ROLE_VAR; EXECUTE IMMEDIATE $r;</code></li>
+<li><strong><code>GRANT IMPORTED PRIVILEGES ... TO ROLE IDENTIFIER(...)</code>
+requires EXECUTE IMMEDIATE.</strong> IDENTIFIER() is not supported in
+this position. Use
+<code>SET g = &#39;...&#39;; EXECUTE IMMEDIATE $g;</code></li>
+<li><strong>Masking policy argument type must match the column’s
+declared type exactly.</strong> A <code>NUMBER(12,2)</code> column
+requires <code>(val NUMBER) RETURNS NUMBER</code>. Using
+<code>FLOAT</code> raises a compile error even when the policy logic is
+correct.</li>
+<li><strong><code>CREATE OR REPLACE MASKING POLICY</code> fails while
+the policy is attached to a column.</strong> Sequence:
+<code>ALTER TABLE t MODIFY COLUMN c UNSET MASKING POLICY;</code> →
+<code>CREATE OR REPLACE</code> → re-apply.</li>
+<li><strong>Session variables don’t exist in Dynamic Table refresh
+context.</strong> <code>EXECUTE AS USER IDENTIFIER($var)</code> and
+<code>FROM IDENTIFIER($var)</code> both fail at refresh time. Use a
+Snowflake Scripting block to embed literal names at DT creation.</li>
+<li><strong><code>EXECUTE IMMEDIATE $g</code> stores command text
+verbatim as the DT body — not the evaluated SQL.</strong> Use
+<code>EXECUTE IMMEDIATE $$ DECLARE ... BEGIN sql := &#39;...&#39;; EXECUTE IMMEDIATE sql; END; $$;</code></li>
+<li><strong>Session variables used in <code>CREATE PROCEDURE</code>
+DECLARE blocks must exist at compile time.</strong>
+<code>DECLARE seg VARCHAR DEFAULT $SEGMENT_FILTER;</code> fails if
+<code>$SEGMENT_FILTER</code> has not been SET before the
+<code>CREATE PROCEDURE</code> statement.</li>
+<li><strong><code>RETURNS TABLE</code> column types must match the
+SELECT output exactly.</strong> Add explicit <code>::NUMBER</code>,
+<code>::FLOAT</code>, <code>::VARCHAR</code> casts to avoid type
+mismatch at call time.</li>
+<li><strong><code>EXECUTE TASK</code> controls two distinct
+things.</strong> <code>OWNERSHIP</code>/<code>OPERATE</code> on a task
+allows <code>ALTER TASK RESUME/SUSPEND</code> (state change only).
+<code>EXECUTE TASK ON ACCOUNT</code> is required for the scheduler to
+actually fire the task body. A task can show state <code>started</code>
+and silently never execute without the account-level privilege.</li>
+<li><strong><code>DESCRIBE PROCEDURE proc_name(arg_type)</code> reveals
+the <code>execute as</code> property.</strong>
+<code>information_schema.procedures</code> (SQL standard view) has no
+<code>execute_as</code> column. Use <code>DESCRIBE PROCEDURE</code> or
+<code>SHOW PROCEDURES</code> + <code>DESCRIBE PROCEDURE</code> to
+confirm execution mode.</li>
 </ul>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <table>
@@ -787,6 +836,62 @@ proc does not call caller’s rights procs</td>
 <td><code>EXECUTE ALERT</code> is account-level; OWNERSHIP does not
 imply it</td>
 <td><code>GRANT EXECUTE ALERT ON ACCOUNT TO ROLE &lt;owner_role&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>IDENTIFIER($var \|\| &#39;suffix&#39;)</code> raises invalid
+identifier</td>
+<td>IDENTIFIER() requires a simple session variable reference, not an
+expression</td>
+<td>Pre-declare: <code>SET R = $PREFIX \|\| &#39;_suffix&#39;;</code> then
+<code>IDENTIFIER($R)</code></td>
+</tr>
+<tr class="odd">
+<td><code>USE ROLE IDENTIFIER(...)</code> raises SQL syntax error</td>
+<td>USE ROLE does not support IDENTIFIER()</td>
+<td><code>SET r = &#39;USE ROLE &#39; \|\| $ROLE; EXECUTE IMMEDIATE $r;</code></td>
+</tr>
+<tr class="even">
+<td><code>CREATE OR REPLACE MASKING POLICY</code> fails on an attached
+policy</td>
+<td>Policy is referenced by a column — cannot replace while
+attached</td>
+<td><code>ALTER TABLE t MODIFY COLUMN c UNSET MASKING POLICY;</code>
+then replace, then re-apply</td>
+</tr>
+<tr class="odd">
+<td>Masking policy raises type mismatch error despite correct logic</td>
+<td>Policy argument type doesn’t match column data type exactly
+(e.g. FLOAT vs NUMBER(12,2))</td>
+<td>Match exactly: <code>NUMBER(12,2)</code> column →
+<code>(val NUMBER) RETURNS NUMBER</code></td>
+</tr>
+<tr class="even">
+<td>Task state is <code>started</code> but body never executes</td>
+<td>OWNERSHIP/OPERATE allows <code>ALTER TASK RESUME</code> (state
+change) but not scheduler execution</td>
+<td><code>GRANT EXECUTE TASK ON ACCOUNT TO ROLE &lt;owner_role&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>SQL variable ... is not defined</code> inside
+<code>CREATE PROCEDURE</code> body</td>
+<td>Session variable missing at compile time</td>
+<td><code>SET my_var = &#39;value&#39;;</code> before the
+<code>CREATE PROCEDURE</code> statement</td>
+</tr>
+<tr class="even">
+<td>Dynamic table body contains <code>EXECUTE IMMEDIATE $g</code>
+literally</td>
+<td>Snowflake stores the DT definition verbatim; session variable is not
+expanded</td>
+<td>Use scripting block:
+<code>EXECUTE IMMEDIATE $$ DECLARE ... BEGIN sql := &#39;...&#39;; EXECUTE IMMEDIATE sql; END; $$;</code></td>
+</tr>
+<tr class="odd">
+<td><code>DESCRIBE PROCEDURE</code> needed to check execution mode</td>
+<td><code>information_schema.procedures</code> has no
+<code>execute_as</code> column</td>
+<td><code>DESCRIBE PROCEDURE proc_name(arg_type);</code> returns the
+execute as property</td>
 </tr>
 </tbody>
 </table>
