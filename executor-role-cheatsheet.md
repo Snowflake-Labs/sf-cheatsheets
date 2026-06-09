@@ -352,6 +352,36 @@ END;
 - **Caller's rights requires the entire call chain.** A single owner's rights proc anywhere
   in a nested call hierarchy converts all downstream procs to owner's rights, regardless
   of their individual `EXECUTE AS` settings.
+- **`IDENTIFIER()` only accepts simple session variable references, not expressions.**
+  `IDENTIFIER($var || '_suffix')` fails everywhere in DDL/DML. Pre-declare all composed names:
+  `SET R_NAME = $PREFIX || '_suffix'; GRANT ... TO ROLE IDENTIFIER($R_NAME);`
+- **`USE ROLE IDENTIFIER(...)` is not valid syntax.** Use EXECUTE IMMEDIATE:
+  `SET r = 'USE ROLE ' || $ROLE_VAR; EXECUTE IMMEDIATE $r;`
+- **`GRANT IMPORTED PRIVILEGES ... TO ROLE IDENTIFIER(...)` requires EXECUTE IMMEDIATE.**
+  IDENTIFIER() is not supported in this position. Use `SET g = '...'; EXECUTE IMMEDIATE $g;`
+- **Masking policy argument type must match the column's declared type exactly.**
+  A `NUMBER(12,2)` column requires `(val NUMBER) RETURNS NUMBER`. Using `FLOAT` raises a
+  compile error even when the policy logic is correct.
+- **`CREATE OR REPLACE MASKING POLICY` fails while the policy is attached to a column.**
+  Sequence: `ALTER TABLE t MODIFY COLUMN c UNSET MASKING POLICY;` → `CREATE OR REPLACE` →
+  re-apply.
+- **Session variables don't exist in Dynamic Table refresh context.**
+  `EXECUTE AS USER IDENTIFIER($var)` and `FROM IDENTIFIER($var)` both fail at refresh time.
+  Use a Snowflake Scripting block to embed literal names at DT creation.
+- **`EXECUTE IMMEDIATE $g` stores command text verbatim as the DT body — not the evaluated SQL.**
+  Use `EXECUTE IMMEDIATE $$ DECLARE ... BEGIN sql := '...'; EXECUTE IMMEDIATE sql; END; $$;`
+- **Session variables used in `CREATE PROCEDURE` DECLARE blocks must exist at compile time.**
+  `DECLARE seg VARCHAR DEFAULT $SEGMENT_FILTER;` fails if `$SEGMENT_FILTER` has not been SET
+  before the `CREATE PROCEDURE` statement.
+- **`RETURNS TABLE` column types must match the SELECT output exactly.**
+  Add explicit `::NUMBER`, `::FLOAT`, `::VARCHAR` casts to avoid type mismatch at call time.
+- **`EXECUTE TASK` controls two distinct things.** `OWNERSHIP`/`OPERATE` on a task allows
+  `ALTER TASK RESUME/SUSPEND` (state change only). `EXECUTE TASK ON ACCOUNT` is required for
+  the scheduler to actually fire the task body. A task can show state `started` and silently
+  never execute without the account-level privilege.
+- **`DESCRIBE PROCEDURE proc_name(arg_type)` reveals the `execute as` property.**
+  `information_schema.procedures` (SQL standard view) has no `execute_as` column.
+  Use `DESCRIBE PROCEDURE` or `SHOW PROCEDURES` + `DESCRIBE PROCEDURE` to confirm execution mode.
 
 ## Troubleshooting
 
@@ -364,6 +394,14 @@ END;
 | Owner's rights proc fails: `SQL variable ... is not defined` | Owner mode cannot read caller's session variables | Pass the variable as an explicit proc parameter |
 | Nested proc unexpectedly runs as owner's rights | Entire chain inherits owner's rights once any proc in it is owner's rights | Extract logic into standalone procs; restructure so owner's rights proc does not call caller's rights procs |
 | `Insufficient privileges to execute ALERT` | `EXECUTE ALERT` is account-level; OWNERSHIP does not imply it | `GRANT EXECUTE ALERT ON ACCOUNT TO ROLE <owner_role>` |
+| `IDENTIFIER($var \|\| 'suffix')` raises invalid identifier | IDENTIFIER() requires a simple session variable reference, not an expression | Pre-declare: `SET R = $PREFIX \|\| '_suffix';` then `IDENTIFIER($R)` |
+| `USE ROLE IDENTIFIER(...)` raises SQL syntax error | USE ROLE does not support IDENTIFIER() | `SET r = 'USE ROLE ' \|\| $ROLE; EXECUTE IMMEDIATE $r;` |
+| `CREATE OR REPLACE MASKING POLICY` fails on an attached policy | Policy is referenced by a column — cannot replace while attached | `ALTER TABLE t MODIFY COLUMN c UNSET MASKING POLICY;` then replace, then re-apply |
+| Masking policy raises type mismatch error despite correct logic | Policy argument type doesn't match column data type exactly (e.g. FLOAT vs NUMBER(12,2)) | Match exactly: `NUMBER(12,2)` column → `(val NUMBER) RETURNS NUMBER` |
+| Task state is `started` but body never executes | OWNERSHIP/OPERATE allows `ALTER TASK RESUME` (state change) but not scheduler execution | `GRANT EXECUTE TASK ON ACCOUNT TO ROLE <owner_role>` |
+| `SQL variable ... is not defined` inside `CREATE PROCEDURE` body | Session variable missing at compile time | `SET my_var = 'value';` before the `CREATE PROCEDURE` statement |
+| Dynamic table body contains `EXECUTE IMMEDIATE $g` literally | Snowflake stores the DT definition verbatim; session variable is not expanded | Use scripting block: `EXECUTE IMMEDIATE $$ DECLARE ... BEGIN sql := '...'; EXECUTE IMMEDIATE sql; END; $$;` |
+| `DESCRIBE PROCEDURE` needed to check execution mode | `information_schema.procedures` has no `execute_as` column | `DESCRIBE PROCEDURE proc_name(arg_type);` returns the execute as property |
 
 ## References
 
