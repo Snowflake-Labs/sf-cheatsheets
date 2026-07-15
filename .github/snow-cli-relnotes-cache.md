@@ -1,4 +1,4 @@
 <!-- Snow CLI release notes cache — auto-updated by changelog-watcher.yml -->
 <!-- Do not edit manually -->
-<!-- sha256: 094bb05a4e0edc1164f2d7788697b4a6b227d5e823b11e87b6c9eec2207ff6b0 -->
-<!-- last-checked: 2026-06-15T11:02:45Z -->
+<!-- sha256: 936fd58d4dc2aa1c83902cd0cbc5a04209816843e108bca7b28df3af791d78f6 -->
+<!-- last-checked: 2026-07-15T09:36:32Z -->
